@@ -1,7 +1,25 @@
 #!/bin/bash
 set -eu
-# this gets run on the amazon machine when it boots up
+# this gets run as root on the amazon machine when it boots up
 
+# install packages we need from amazon's repo
 yum install git tomcat7
+
+# create role account for the application
 useradd aspace
-su aspace -c "git clone https://github.com/archivesspace/archivesspace.git"
+
+# execute this script as the role account
+su aspace -c <<EOF
+set -eu
+git clone https://github.com/archivesspace/archivesspace.git
+cd archivesspace
+./build/run bootstrap 
+./build/run backend:integration 
+./build/run backend:test
+./build/run common:test
+# make edits to config/config-distribution.rb, pointing to the AWS RDS mysql DB that we've started
+./build/run backend:war
+./build/run frontend:war
+EOF
+
+# notifications?

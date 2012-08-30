@@ -9,11 +9,12 @@ genconf() {
     then 
       chmod u+w $1
   fi
-  echo $1 $2 $3
   sed s,%{$2},$3, $1.in > $1
   chmod u-w $1
 }
 
+# create user-data script payload
+# https://help.ubuntu.com/community/CloudInit
 cat > aws_init.sh << DELIM
 #!/bin/bash
 set -eu
@@ -28,9 +29,18 @@ useradd aspace
 # execute this script as the role account
 su aspace -c <<EOSETUP
 DELIM
-# these are the commands run as the role account on the server
-# TODO: need to edit this so that it can create the correct config/config-distribution.rb
-cat as_role_account.sh.in >> aws_init.sh 
+
+# middle of payload user-data file
+# need to get this information into config/config.rb on the AWS machine
+password=`cat ~/.ec2/.dbpass`
+# TODO: some of this info will need to be passed on from launch-rds.sh
+db_url="jdbc:mysql://localhost:3306/archivesspace?user=as&password=$password"
+
+# these commands will be run as the role account on the server
+genconf as_role_account.sh DB_URL $db_url	# set the database URL in the payload
+cat as_role_account.sh >> aws_init.sh 
+
+# finish off the user-data payload file
 cat >> aws_init.sh << DELIM
 EOSETUP
 
@@ -43,8 +53,6 @@ DELIM
 
 exit 0  ## still testing; don't run the command yet
 
-# compress the user-data payload
-# https://help.ubuntu.com/community/CloudInit
 gzip aws_init.sh
 # clean up
 rm as_role_accout.sh

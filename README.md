@@ -3,6 +3,39 @@
 This github gist contains scripts used to launch the alpha version
 of an archival management system product on Amazon Web Services.
 
+
+Installation
+------------
+These files go in ~/aws/
+
+In the management console, you will need to go to "My Account" >
+"Security Credentials" > "X.509 Certificates" > "Create a new
+Certificate".  Download the .pem files and put them in ~/.ec2
+
+Create a file .dbpass in ~/.ec2 with the password for the database.
+
+Grab the amazon command line tools.
+
+```sh
+./grabazon.sh
+```
+
+Launch an AWS RDS server.
+
+```sh
+./launch-rds.sh
+```
+
+Launch the EC2 server.
+
+```sh
+./launch-ec2.sh
+```
+
+
+License
+-------
+
 Copyright © 2012, Regents of the University of California
 All rights reserved.
 

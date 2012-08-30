@@ -28,6 +28,8 @@ useradd aspace
 # execute this script as the role account
 su aspace -c <<EOSETUP
 DELIM
+# these are the commands run as the role account on the server
+# TODO: need to edit this so that it can create the correct config/config-distribution.rb
 cat as_role_account.sh.in >> aws_init.sh 
 cat >> aws_init.sh << DELIM
 EOSETUP
@@ -39,15 +41,17 @@ EOSETUP
 # notifications?
 DELIM
 
-exit 0
+exit 0  ## still testing; don't run the command yet
 
+# compress the user-data payload
+# https://help.ubuntu.com/community/CloudInit
 gzip aws_init.sh
+# clean up
 rm as_role_accout.sh
 
 # http://docs.amazonwebservices.com/AWSEC2/latest/CommandLineReference/ApiReference-cmd-RunInstances.html
 ec2-run-instances $AMI                \
      --verbose                        \
-     # https://help.ubuntu.com/community/CloudInit
      --user-data-file aws_init.sh.gz  \
      --key ~/.ec2/ec2-keypair         \
      --monitor                        \

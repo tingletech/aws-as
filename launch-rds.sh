@@ -1,7 +1,7 @@
 #!/bin/bash
+set -eu
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )" # http://stackoverflow.com/questions/59895
 . $DIR/setenv.sh
-set -eu
 # http://docs.amazonwebservices.com/AmazonRDS/latest/CommandLineReference/CLIReference-cmd-CreateDBInstance.html
 rds-create-db-instance            \
   --db-instance-identifier alpha  \

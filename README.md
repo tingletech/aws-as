@@ -10,11 +10,13 @@ These files go in ~/aws/
 
 In the management console, you will need to go to "My Account" >
 "Security Credentials" > "X.509 Certificates" > "Create a new
-Certificate".  Download the .pem files and put them in ~/.ec2
+Certificate".  Download the .pem files and put them in ~/.ec2 .
 
 Create a file .dbpass in ~/.ec2 with the password for the database.
 
-Fix the permissions on ~/.ec2
+Create a private ssh key at ~/.ec2/ec2-keypair .
+
+Fix the permissions on ~/.ec2 :
 
 ```sh
 chmod -R 700 ~/.ec2/
@@ -25,13 +27,6 @@ Grab the amazon command line tools.
 
 ```sh
 ./grabazon.sh
-```
-
-Create a keypair.
-
-```sh
-. setenv.sh
-ec2-add-keypair ec2-keypair
 ```
 
 Launch services on AWS

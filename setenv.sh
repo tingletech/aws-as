@@ -25,4 +25,4 @@ export EC2_REGION=us-east-1
 export ZONE=us-east-1b
 
 # http://aws.amazon.com/amazon-linux-ami/ 
-export AMI=ami-94cd60fd
+export AMI=ami-94cd60fd		# this is a 64-bit Amazon Linux AMI with session storage

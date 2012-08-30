@@ -22,4 +22,8 @@ cd archivesspace
 ./build/run frontend:war
 EOF
 
+# install war files into tomcat
+
+# start tomcat
+
 # notifications?

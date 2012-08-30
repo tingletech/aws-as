@@ -1,3 +1,8 @@
+## Archival applicaiton set up scripts for AWS
+
+This github gist contains scripts used to launch the alpha version
+of an archival management system product on Amazon Web Services.
+
 Copyright © 2012, Regents of the University of California
 All rights reserved.
 

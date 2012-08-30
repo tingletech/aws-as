@@ -4,7 +4,7 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )" # http://stackoverflow.c
 set -eu
 ec2-run-instances                     \
      --verbose                        \
-     --user-data-file aws_int.sh      \
+     --user-data-file aws_init.sh     \
      --key ec2-keypair                \
      --monitor                        \
      --instance-type m1.small         \

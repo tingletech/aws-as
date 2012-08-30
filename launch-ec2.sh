@@ -1,17 +1,23 @@
 #!/bin/bash
-set -eu
+set -eu		# exit if a command has an error or if there is an undefined variable
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )" # http://stackoverflow.com/questions/59895
 . $DIR/setenv.sh
 cd $DIR
 
-genconf() {
+genconf() {	# poor man's templates
   if [ -e $1 ]
     then 
       chmod u+w $1
   fi
   sed s,%{$2},$3, $1.in > $1
-  chmod u-w $1
 }
+
+# figure out database connection string to put in confing/config.rb
+password=`cat ~/.ec2/.dbpass`
+# get the hostname for the database
+endpoint=`rds-describe-db-instances alpha | awk '{ print $9 }'`
+# endpoint will be undefined if the database is not started, undefined variable will cause an abort
+db_url="jdbc:mysql://$endpoint:3306/archivesspace?user=as&password=$password"
 
 # create user-data script payload
 # https://help.ubuntu.com/community/CloudInit
@@ -31,10 +37,6 @@ su aspace -c <<EOSETUP
 DELIM
 
 # middle of payload user-data file
-# need to get this information into config/config.rb on the AWS machine
-password=`cat ~/.ec2/.dbpass`
-# TODO: some of this info will need to be passed on from launch-rds.sh
-db_url="jdbc:mysql://localhost:3306/archivesspace?user=as&password=$password"
 
 # these commands will be run as the role account on the server
 genconf as_role_account.sh DB_URL $db_url	# set the database URL in the payload
@@ -50,8 +52,6 @@ EOSETUP
 
 # notifications?
 DELIM
-
-exit 0  ## still testing; don't run the command yet
 
 gzip aws_init.sh
 # clean up

@@ -7,10 +7,10 @@ rds-create-db-instance            \
   --db-instance-identifier alpha  \
   --db-instance-class db.m1.small \
   --engine MySQL                  \
-  --db-name aspace                \
+  --db-name archivesspace         \
   --master-user-password -        \
   --port 3306                     \
   --backup-retention-period 1     \
   --allocated-storage 10          \
-  --master-username aspace        \
+  --master-username as            \
   --availability-zone $ZONE < ~/.ec2/.dbpass

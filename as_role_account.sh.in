@@ -1,5 +1,5 @@
 # run as role account
-set -eu
+set -eux
 git clone https://github.com/archivesspace/archivesspace.git
 cd archivesspace
 ./build/run bootstrap 

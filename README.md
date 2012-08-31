@@ -38,6 +38,23 @@ Launch an AWS RDS server.
 ./launch-rds.sh
 ```
 
+Wait for the server to spin up.  At first, `rds-describe-db-instances` will return something like this:
+```
+DBINSTANCE  alpha01  db.m1.small  mysql  10  aspace  creating  us-east-1b  1  ****  n  5.5.25a  general-public-license
+      SECGROUP  default  active
+      PARAMGRP  default.mysql5.5  in-sync
+      OPTIONGROUP  default:mysql-5-5  in-sync
+```
+
+Once the database has cranked up; you should see something like this:
+
+```
+DBINSTANCE  alpha01  2012-08-31T20:27:02.502Z  db.m1.small  mysql  10  aspace  backing-up  alpha01.blahblah.us-east-1.rds.amazonaws.com  3306  us-east-1b  1  n  5.5.25a  general-public-license
+      SECGROUP  default  active
+      PARAMGRP  default.mysql5.5  in-sync
+      OPTIONGROUP  default:mysql-5-5  in-sync
+```
+
 Launch the EC2 server.
 
 ```sh

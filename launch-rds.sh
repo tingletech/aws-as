@@ -1,4 +1,5 @@
 #!/bin/bash
+# launch a mysql server on RDS
 set -eux
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )" # http://stackoverflow.com/questions/59895
 . $DIR/setenv.sh

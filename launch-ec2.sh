@@ -5,14 +5,14 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )" # http://stackoverflow.c
 cd $DIR
 
 hackconf() {	# poor man's templates; hard coded for %{DB_URL} and %{password}
-  sed -e "s,%{DB_URL},$2," -e "s,%{password},$3," $1.in > $1
+  sed -e "s,%{DB_URL},$2," -e "s,%{password},$3," -e "s,%{endpoint},$4," $1.in > $1
 }
 
 # figure out database connection string to put in confing/config.rb
 password=`cat ~/.ec2/.dbpass`
 # get the hostname for the database
 endpoint=`rds-describe-db-instances alpha | awk '{ print $9 }'`
-
+endpoint="endpoint"
 
 db_url="jdbc:mysql://$endpoint:3306/archivesspace?user=as\&password=$password"
 #                                                        ^ escaped for regex ...
@@ -44,7 +44,7 @@ DELIM
 
 # as_role_account.sh will be run as the role account on the AWS EC2 server
 # hack sensitive info into the script
-hackconf as_role_account.sh $db_url $password
+hackconf as_role_account.sh $db_url $password $endpoint
 # cat the script into the payload
 cat as_role_account.sh >> aws_init.sh 
 
@@ -75,3 +75,6 @@ ec2-run-instances $AMI                \
      --monitor                        \
      --instance-type m1.small         \
      --availability-zone $ZONE
+
+# clean up
+rm aws_init.sh.gz

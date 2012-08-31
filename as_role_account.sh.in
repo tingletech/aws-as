@@ -15,13 +15,19 @@ RAILSCONFIG
 
 # now, write a database.yml file
 cat > frontend/config/database.yml << DATABASEYML
-development:
+#
+# http://bleything.net/articles/dry-out-your-database-yml.html
+#
+login: &login
   adapter: mysql
   encoding: utf8
-  database: archivesspace
   username: as
   password: %{password}
-  socket: /tmp/mysql.sock
+  host: %{endpoint}
+
+development:
+  <<: *login
+  database: archivesspace
 
 # Warning: The database defined as "test" will be erased and
 # re-generated from your development database when you run "rake".
@@ -31,12 +37,9 @@ test:
   database: db/test.sqlite3
 
 production:
-  adapter: mysql
-  encoding: utf8
+  <<: *login
   database: archivesspace
-  username: as
-  password: %{password}
-  socket: /tmp/mysql.sock
+
 DATABASEYML
 # end of database.yml file
 

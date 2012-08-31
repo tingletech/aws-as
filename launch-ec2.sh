@@ -4,22 +4,25 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )" # http://stackoverflow.c
 . $DIR/setenv.sh
 cd $DIR
 
-genconf() {	# poor man's templates
-  if [ -e $1 ]
-    then 
-      chmod u+w $1
-  fi
-  sed s,%{$2},$3, $1.in > $1
+hackconf() {	# poor man's templates; hard coded for %{DB_URL} and %{password}
+  sed -e "s,%{DB_URL},$2," -e "s,%{password},$3," $1.in > $1
 }
 
 # figure out database connection string to put in confing/config.rb
 password=`cat ~/.ec2/.dbpass`
 # get the hostname for the database
 endpoint=`rds-describe-db-instances alpha | awk '{ print $9 }'`
-# endpoint will be undefined if the database is not started, undefined variable will cause an abort
-db_url="jdbc:mysql://$endpoint:3306/archivesspace?user=as&password=$password"
 
-# create user-data script payload
+
+db_url="jdbc:mysql://$endpoint:3306/archivesspace?user=as\&password=$password"
+#                                                        ^ escaped for regex ...
+
+if [ -z "$endpoint" ]; then		# not sure why set -u is not catching this
+  echo "no endpoint, did you run launch-rds.sh?"
+  exit 1
+fi
+
+# start user-data script payload
 # https://help.ubuntu.com/community/CloudInit
 cat > aws_init.sh << DELIM
 #!/bin/bash
@@ -28,6 +31,7 @@ set -eu
 
 # install packages we need from amazon's repo
 yum install git tomcat7
+yum install mysql-bench
 
 # create role account for the application
 useradd aspace
@@ -38,24 +42,30 @@ DELIM
 
 # middle of payload user-data file
 
-# these commands will be run as the role account on the server
-genconf as_role_account.sh DB_URL $db_url	# set the database URL in the payload
+# as_role_account.sh will be run as the role account on the AWS EC2 server
+# hack sensitive info into the script
+hackconf as_role_account.sh $db_url $password
+# cat the script into the payload
 cat as_role_account.sh >> aws_init.sh 
 
 # finish off the user-data payload file
 cat >> aws_init.sh << DELIM
 EOSETUP
 
-# install war files into tomcat
+# tweak environment
+# java -DARCHIVESSPACE_BACKEND=localhost:8089
 
-# start tomcat
+# install war files into tomcat
+# actually... need two tomcats...
 
 # notifications?
 DELIM
 
 gzip aws_init.sh
 # clean up
-rm as_role_accout.sh
+rm as_role_account.sh 
+
+exit 0 # testing
 
 # http://docs.amazonwebservices.com/AWSEC2/latest/CommandLineReference/ApiReference-cmd-RunInstances.html
 ec2-run-instances $AMI                \

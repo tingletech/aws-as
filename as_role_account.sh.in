@@ -11,6 +11,35 @@ cd archivesspace
 cat > config/config.rb << RAILSCONFIG
 AppConfig[:db_url] = "%{DB_URL}"
 RAILSCONFIG
+# end of here file with config.rb (not really sure if this is railsconf)
+
+# now, write a database.yml file
+cat > frontend/config/database.yml << DATABASEYML
+development:
+  adapter: mysql
+  encoding: utf8
+  database: archivesspace
+  username: as
+  password: %{password}
+  socket: /tmp/mysql.sock
+
+# Warning: The database defined as "test" will be erased and
+# re-generated from your development database when you run "rake".
+# Do not set this db to the same as development or production.
+test:
+  adapter: sqlite3
+  database: db/test.sqlite3
+
+production:
+  adapter: mysql
+  encoding: utf8
+  database: archivesspace
+  username: as
+  password: %{password}
+  socket: /tmp/mysql.sock
+DATABASEYML
+# end of database.yml file
+
 ./build/run db:migrate
 ./build/run backend:war
 ./build/run frontend:war

@@ -13,7 +13,7 @@ hackconf() {	# poor man's templates; hard coded for %{DB_URL} and %{password}
 # figure out database connection string to put in confing/config.rb
 password=`cat ~/.ec2/.dbpass`
 # get the hostname for the database
-endpoint=`rds-describe-db-instances alpha | head -1 | awk '{ print $9 }'`
+endpoint=`rds-describe-db-instances $DB_INSTANCE_IDENTIFIER | head -1 | awk '{ print $9 }'`
 endpoint="endpoint"
 
 db_url="jdbc:mysql://$endpoint:3306/archivesspace?user=aspace\&password=$password"

@@ -5,7 +5,7 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )" # http://stackoverflow.c
 . $DIR/setenv.sh
 # http://docs.amazonwebservices.com/AmazonRDS/latest/CommandLineReference/CLIReference-cmd-CreateDBInstance.html
 rds-create-db-instance            \
-  --db-instance-identifier alpha  \
+  $DB_INSTANCE_IDENTIFIER         \
   --db-instance-class db.m1.small \
   --engine MySQL                  \
   --db-name archivesspace         \

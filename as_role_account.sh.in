@@ -11,5 +11,6 @@ cd archivesspace
 cat > config/config.rb << RAILSCONFIG
 AppConfig[:db_url] = "%{DB_URL}"
 RAILSCONFIG
+./build/run db:migrate
 ./build/run backend:war
 ./build/run frontend:war

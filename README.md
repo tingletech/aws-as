@@ -51,6 +51,8 @@ AWS Command Documentation
 
 [ec2-run-instances](http://docs.amazonwebservices.com/AWSEC2/latest/CommandLineReference/ApiReference-cmd-RunInstances.html)
 
+[ubuntu cloud init](https://help.ubuntu.com/community/CloudInit) is used by the [Amazon Linux AMI](http://aws.amazon.com/amazon-linux-ami/)
+
 License
 -------
 

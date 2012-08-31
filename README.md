@@ -44,6 +44,12 @@ Launch the EC2 server.
 ./launch-ec2.sh
 ```
 
+AWS Command Documentation
+------------------
+
+[rds-create-db-instance](http://docs.amazonwebservices.com/AmazonRDS/latest/CommandLineReference/CLIReference-cmd-CreateDBInstance.html)
+
+[ec2-run-instances](http://docs.amazonwebservices.com/AWSEC2/latest/CommandLineReference/ApiReference-cmd-RunInstances.html)
 
 License
 -------

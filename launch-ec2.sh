@@ -17,7 +17,7 @@ endpoint=`rds-describe-db-instances $DB_INSTANCE_IDENTIFIER | head -1 | awk '{ p
 endpoint="endpoint"
 
 db_url="jdbc:mysql://$endpoint:3306/archivesspace?user=aspace\&password=$password"
-#                                                        ^ escaped for regex ...
+#                                                            ^ escaped for regex ...
 
 if [ -z "$endpoint" ]; then		# not sure why set -u is not catching this
   echo "no endpoint, did you run launch-rds.sh?"
@@ -32,14 +32,14 @@ set -eux
 # this gets run as root on the amazon machine when it boots up
 
 # install packages we need from amazon's repo
-yum install git tomcat7
-yum install mysql-bench
+yum -y install git tomcat7
+yum -y install mysql-bench
 
 # create role account for the application
 useradd aspace
 
 # execute this script as the role account
-su aspace -c <<EOSETUP
+cat > ~aspace/init.sh <<EOSETUP
 DELIM
 
 # middle of payload user-data file
@@ -53,6 +53,8 @@ cat as_role_account.sh >> aws_init.sh
 # finish off the user-data payload file
 cat >> aws_init.sh << DELIM
 EOSETUP
+# still on remote machine
+su - -c aspace ~aspace/init.sh
 
 # tweak environment
 # java -DARCHIVESSPACE_BACKEND=localhost:8089
@@ -62,18 +64,18 @@ EOSETUP
 
 # notifications?
 DELIM
+# back to the local machine
 
 gzip aws_init.sh
 # clean up
 rm as_role_account.sh 
 
-exit 0 # testing
-
 # http://docs.amazonwebservices.com/AWSEC2/latest/CommandLineReference/ApiReference-cmd-RunInstances.html
+# "You must have the key pair where you run your script." -- https://forums.aws.amazon.com/message.jspa?messageID=88003
 ec2-run-instances $AMI                \
      --verbose                        \
      --user-data-file aws_init.sh.gz  \
-     --key ~/.ec2/ec2-keypair         \
+     --key ec2-keypair                \
      --monitor                        \
      --instance-type m1.small         \
      --availability-zone $ZONE

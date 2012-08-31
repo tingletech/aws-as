@@ -12,5 +12,5 @@ rds-create-db-instance            \
   --port 3306                     \
   --backup-retention-period 1     \
   --allocated-storage 10          \
-  --master-username as            \
+  --master-username aspace        \
   --availability-zone $ZONE < ~/.ec2/.dbpass

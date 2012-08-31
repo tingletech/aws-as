@@ -21,7 +21,7 @@ cat > frontend/config/database.yml << DATABASEYML
 login: &login
   adapter: mysql
   encoding: utf8
-  username: as
+  username: aspace
   password: %{password}
   host: %{endpoint}
 

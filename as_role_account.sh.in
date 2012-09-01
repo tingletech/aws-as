@@ -1,6 +1,7 @@
 # run as role account
 set -eux
 git clone https://github.com/archivesspace/archivesspace.git
+cp -rp archivesspace archivesspace.orig
 cd archivesspace
 ./build/run bootstrap 
 ./build/run backend:integration 
@@ -43,6 +44,10 @@ production:
 DATABASEYML
 # end of database.yml file
 
-./build/run db:migrate
+./build/run db:migrate 		# this runs and talks to the mysql in amazon okay
 ./build/run backend:war
 ./build/run frontend:war
+
+cd ../archivesspace.orig
+./build/run dist
+daemonize -c . -e daemonize/stderr -o daemonize/stdout -p daemonize/pid -l daemonize/lock /usr/bin/java -jar archivesspace.jar 8080

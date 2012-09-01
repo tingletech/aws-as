@@ -49,6 +49,14 @@ yum -y install nodejs-compat-symlinks npm
 
 yum -y install cpan  # would be cool to get ack working
 
+# can't find a package for http://software.clapper.org/daemonize/
+cd /usr/local/src
+git clone http://github.com/bmc/daemonize.git
+cd daemonize
+sh configure
+make
+make install
+
 # create role account for the application
 useradd aspace
 # so we can read the log files
@@ -83,11 +91,14 @@ su - -c aspace ~aspace/init.sh
 # To change values for a specific service make your edits here.
 # To create a new service create a link from /etc/init.d/<your new service> to
 # /etc/init.d/tomcat7 (do not copy the init script) 
-ln -s /etc/init.d/tomcat7 /etc/init.d/tomcat7back
+# ln -s /etc/init.d/tomcat7 /etc/init.d/tomcat7back
 
 # and make a copy of the
 # /etc/sysconfig/tomcat7 file to /etc/sysconfig/<your new service>
-cp /etc/sysconfig/tomcat7 /etc/sysconfig/tomcat7back
+#cp /etc/sysconfig/tomcat7 /etc/sysconfig/tomcat7back
+# and change
+# the property values so the two services won't conflict.
+## sed sed sed
 cp -rp /usr/share/tomcat7/ /usr/share/tomcat7back
 
 # http://serverfault.com/a/252042
@@ -98,23 +109,28 @@ iptables -A PREROUTING -t nat -i eth0 -p tcp --dport 80 -j REDIRECT --to-port 80
 
 # public_address=`curl http://169.254.169.254/latest/meta-data/public-ipv4`
 
-# and change
-# the property values so the two services won't conflict.
-## sed sed sed
+exit # just using the bulit in test server and derby for now
 
 # Register the new
 # service in the system as usual (see chkconfig and similars).
 ## chkconfig!
 # install war files into tomcat
 cp /home/aspace/archivesspace/frontend/frontend.war /usr/share/tomcat7/webapps/ROOT.war
+## hacking around the missing mysql driver...
+cd /usr/share/tomcat7/webapps
+unzip /usr/share/tomcat7/webapps/ROOT.war
+cp /home/aspace/archivesspace/build/gems/gems/jdbc-mysql-5.1.13/lib/mysql-connector-java-5.1.13.jar /usr/share/tomcat7/webapps/ROOT/WEB-INF/lib/
+
+# can these run in one server, rathern than two?
 cp /home/aspace/archivesspace/backend/backend.war /usr/share/tomcat7back/webapps/ROOT.war
+
 service tomcat7 start
 
 
 # http://www.excelsior-usa.com/articles/tomcat-amazon-ec2-basic.html
 # To have Tomcat start automatically on instance boot, issue the following commands:
 chkconfig --level 345 tomcat7 on
-chkconfig --level 345 tomcat7back on
+# chkconfig --level 345 tomcat7back on
 
 # notifications?
 DELIM

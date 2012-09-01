@@ -47,7 +47,12 @@ pip install http://guichaz.free.fr/iotop/files/iotop-0.4.4.tar.gz
 yum -y localinstall --nogpgcheck http://nodejs.tchol.org/repocfg/amzn1/nodejs-stable-release.noarch.rpm 
 yum -y install nodejs-compat-symlinks npm
 
-yum -y install cpan  # would be cool to get ack working
+# _   /|  ack is a tool like grep, optimized for programmers
+# \'o.O'  http://betterthangrep.com
+# =(___)=                                                 not sure exactly what is going on here
+#    U    ack!                                                                   ⇩ ⇩
+curl http://betterthangrep.com/ack-standalone > /usr/local/bin/ack && chmod 0755 !#:3
+
 
 # can't find a package for http://software.clapper.org/daemonize/
 cd /usr/local/src

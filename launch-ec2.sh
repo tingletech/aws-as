@@ -55,6 +55,7 @@ curl http://betterthangrep.com/ack-standalone > /usr/local/bin/ack && chmod 0755
 
 
 # can't find a package for http://software.clapper.org/daemonize/
+# used to run the standalone server as a daemon
 cd /usr/local/src
 git clone http://github.com/bmc/daemonize.git
 cd daemonize
@@ -106,9 +107,7 @@ su - -c aspace ~aspace/init.sh
 ## sed sed sed
 cp -rp /usr/share/tomcat7/ /usr/share/tomcat7back
 
-# http://serverfault.com/a/252042
-# iptables -t nat -I PREROUTING -p tcp -i eth0 --dport 8080 -j DNAT --to-destination 127.0.0.1:80 -- did not work :(
-# http://www.klawitter.de/tomcat80.html
+# redirect port 8080 to port 80 so we don't have to run tomcat as root
 # http://forum.slicehost.com/index.php?p=/discussion/2497/iptables-redirect-port-80-to-port-8080/p1
 iptables -A PREROUTING -t nat -i eth0 -p tcp --dport 80 -j REDIRECT --to-port 8080
 

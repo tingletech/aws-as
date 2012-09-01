@@ -1,6 +1,7 @@
 # run as role account
 set -eux
 git clone https://github.com/archivesspace/archivesspace.git
+# make a copy so we can run standalone as a back up
 cp -rp archivesspace archivesspace.orig
 cd archivesspace
 ./build/run bootstrap 
@@ -48,6 +49,18 @@ DATABASEYML
 ./build/run backend:war
 ./build/run frontend:war
 
+# if we are running two tomcats; maybe it will be eaiser to set up in the role account
+# rather than using the tomcat7 that comes with Amazon Linux
+# or... run a tomcat6 and a tomcat7?
+
+# For now, run exactly what gets checked out as a standalone service
+#
 cd ../archivesspace.orig
 ./build/run dist
-daemonize -c . -e daemonize/stderr -o daemonize/stdout -p daemonize/pid -l daemonize/lock /usr/bin/java -jar archivesspace.jar 8080
+mkdir daemonize
+daemonize -c .       \
+ -e daemonize/stderr \
+ -o daemonize/stdout \
+ -p daemonize/pid    \
+ -l daemonize/lock   \
+ /usr/bin/java -jar archivesspace.jar 8080

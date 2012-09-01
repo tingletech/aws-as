@@ -6,8 +6,8 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )" # http://stackoverflow.c
 . $DIR/setenv.sh
 cd $DIR
 
-hackconf() {	# poor man's templates; hard coded for %{DB_URL} and %{password}
-  sed -e "s,%{DB_URL},$2," -e "s,%{password},$3," -e "s,%{endpoint},$4," $1.in > $1
+hackconf() {	# poor man's templates; hard coded for %{DB_URL}, %{password} and %{endpoint}
+  sed -e "s,%{DB_URL},$2," -e "s,%{password},$3," -e "s,%{endpoint},$4," $1.template.sh > $1
 }
 
 # figure out database connection string to put in confing/config.rb

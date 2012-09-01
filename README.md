@@ -55,6 +55,15 @@ DBINSTANCE  alpha01  2012-08-31T20:27:02.502Z  db.m1.small  mysql  10  aspace  b
       OPTIONGROUP  default:mysql-5-5  in-sync
 ```
 
+grant access (security groups left as an exercise for the reader)
+
+```
+ec2-authorize blah -p 22
+ec2-authorize blah -p 80
+rds-authorize-db-security-group-ingress blah --ec2-security-group-name blah --ec2-security-group-owner-id 8675309
+
+```
+
 Launch the EC2 server.
 
 ```sh

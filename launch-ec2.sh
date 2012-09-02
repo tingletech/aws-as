@@ -38,24 +38,12 @@ yum -y install mysql-bench	# assuming this is needed for mysql client??
 # yum -y install monit		# set this up later
 yum -y install tree
 yum -y install libxslt		# need this for tomcat setup
-
-# iotop is a handy utility on linux
-easy_install pip
-pip install http://guichaz.free.fr/iotop/files/iotop-0.4.4.tar.gz
-
 # node speeds up sprockets asset pipeline generation during build
 # https://github.com/joyent/node/wiki/Installing-Node.js-via-package-manager
 yum -y localinstall --nogpgcheck http://nodejs.tchol.org/repocfg/amzn1/nodejs-stable-release.noarch.rpm 
 yum -y install nodejs-compat-symlinks npm
-
-# _   /|  ack is a tool like grep, optimized for programmers
-# \'o.O'  http://betterthangrep.com
-# =(___)=                                                 not sure exactly what is going on here
-#    U    ack!                                                                   ⇩ ⇩
-curl http://betterthangrep.com/ack-standalone > /usr/local/bin/ack && chmod 0755 !#:3
-
 # can't find a package for http://software.clapper.org/daemonize/
-# used to run the standalone server as a daemon
+# used to run the standalone archivesspace.jar server as a daemon
 cd /usr/local/src
 git clone http://github.com/bmc/daemonize.git
 cd daemonize
@@ -63,19 +51,28 @@ sh configure
 make
 make install
 
+# these aren't strictly nessicary for the application but will be usful for debugging
+
+# iotop is a handy utility on linux
+easy_install pip
+pip install http://guichaz.free.fr/iotop/files/iotop-0.4.4.tar.gz
+
+# _   /|  ack is a tool like grep, optimized for programmers
+# \'o.O'  http://betterthangrep.com
+# =(___)=                                                 not sure exactly what is going on here
+#    U    ack!                                                                   ⇩ ⇩
+curl http://betterthangrep.com/ack-standalone > /usr/local/bin/ack && chmod 0755 !#:3
+
+
 # create role account for the application
 useradd aspace
-# so we can read the log files
 
-# execute this script as the role account
 cat > ~aspace/init.sh <<EOSETUP
 DELIM
-
-# middle of payload user-data file
-
-
-# as_role_account.sh will be run as the role account on the AWS EC2 server
-# hack sensitive info into the script
+# as_role_account.sh is created from as_role_account.sh.template.sh
+# it is run as the aspace role account on the target machine 
+# a poor sed based template system is used (switch to better perl oneliner)
+# to hack sensitive info into the script
 hackconf as_role_account.sh $db_url $password $endpoint
 # cat the script into the payload
 cat as_role_account.sh >> aws_init.sh 
@@ -84,10 +81,10 @@ cat as_role_account.sh >> aws_init.sh
 cat >> aws_init.sh << DELIM
 EOSETUP
 # back on remote machine as root
+chmod 600 ~aspace/init.sh
+# su to aspace and run the payload
 su - -c aspace ~aspace/init.sh
-
-# tweak environment
-# java -DARCHIVESSPACE_BACKEND=localhost:8089 ??
+# rm ~aspace/init.sh ## remove the init.sh file when it has run once we have this all working
 
 # redirect port 8080 to port 80 so we don't have to run tomcat as root
 # http://forum.slicehost.com/index.php?p=/discussion/2497/iptables-redirect-port-80-to-port-8080/p1
@@ -95,13 +92,9 @@ iptables -A PREROUTING -t nat -i eth0 -p tcp --dport 80 -j REDIRECT --to-port 80
 
 # public_address=`curl http://169.254.169.254/latest/meta-data/public-ipv4`
 
-exit # just using the bulit in test server and derby for now
+## chkconfig an init.d script that will start and stop monit
 
-# Register the new
-# service in the system as usual (see chkconfig and similars).
-## chkconfig!
-
-# notifications?
+# send notifications?
 DELIM
 # back to the local machine
 

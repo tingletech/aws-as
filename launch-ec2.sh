@@ -66,6 +66,10 @@ curl http://betterthangrep.com/ack-standalone > /usr/local/bin/ack && chmod 0755
 
 # create role account for the application
 useradd aspace
+# remember this is just session storage, this is just for creating a test server
+# move the application home directory onto the bigger disk
+mv /home/aspace /media/ephemeral0/aspace
+ln -s /media/ephemeral0/aspace /home/aspace
 
 cat > ~aspace/init.sh <<EOSETUP
 DELIM

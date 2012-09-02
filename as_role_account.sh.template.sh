@@ -66,7 +66,8 @@ cp /home/aspace/archivesspace/build/gems/gems/jdbc-mysql-5.1.13/lib/mysql-connec
 # can these run in one server, rathern than two?
 cp /home/aspace/archivesspace/backend/backend.war twincat/appBack/webapps/ROOT.war
 
-# java -DARCHIVESSPACE_BACKEND=localhost:8089 ??
+# java -DARCHIVESSPACE_BACKEND=localhost:8089 ??  via JAVA_OPTS?
+export START_LISTEN=8081	# appFront will be on 8081; appBack will be on 8082 -- standalone jar will grab 8080 and 8089
 ./twincat/wrapper.sh appFront ./twincat/tomcat/bin/startup.sh
 ./twincat/wrapper.sh appBack ./twincat/tomcat/bin/startup.sh
 

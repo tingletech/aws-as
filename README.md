@@ -6,7 +6,7 @@ of an archival management system product on Amazon Web Services.
 
 Installation
 ------------
-These files go in ~/aws/
+The system configuration files in this gist go in `~/aws/`
 
 In the management console, you will need to go to "My Account" >
 "Security Credentials" > "X.509 Certificates" > "Create a new
@@ -14,7 +14,9 @@ Certificate".  Download the .pem files and put them in ~/.ec2 .
 
 Create a file .dbpass in `~/.ec2` with the password for the database.
 
-Create a private ssh key at ~/aws/ec2-keypair .
+Create a private ssh key at `~/aws/ec2-keypair` .
+
+(most commands assume current working directory of `~/aws`)
 
 ```
 . setenv.sh

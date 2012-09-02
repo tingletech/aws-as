@@ -49,6 +49,27 @@ DATABASEYML
 ./build/run backend:war
 ./build/run frontend:war
 
+cd ~aspace
+# https://github.com/tingletech/twincat SNAC style ‖tomcat 
+git clone https://github.com/tingletech/twincat.git
+cd twincat
+./grabcat.sh
+
+# install war files into tomcat
+cp /home/aspace/archivesspace/frontend/frontend.war appFront/webapps/ROOT.war
+## hacking around the missing mysql driver...
+cd appFront/webapps
+unzip ROOT.war
+cd ~aspace
+cp /home/aspace/archivesspace/build/gems/gems/jdbc-mysql-5.1.13/lib/mysql-connector-java-5.1.13.jar twincat/appFront/webapps/ROOT/WEB-INF/lib/
+
+# can these run in one server, rathern than two?
+cp /home/aspace/archivesspace/backend/backend.war twincat/appBack/webapps/ROOT.war
+
+# java -DARCHIVESSPACE_BACKEND=localhost:8089 ??
+./twincat/wrapper.sh appFront ./twincat/tomcat/bin/startup.sh
+./twincat/wrapper.sh appBack ./twincat/tomcat/bin/startup.sh
+
 # if we are running two tomcats; maybe it will be eaiser to set up in the role account
 # rather than using the tomcat7 that comes with Amazon Linux
 # or... run a tomcat6 and a tomcat7?

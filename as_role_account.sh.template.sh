@@ -53,7 +53,7 @@ cd ~aspace
 # https://github.com/tingletech/twincat SNAC style ‖tomcat 
 git clone https://github.com/tingletech/twincat.git
 cd twincat
-./grabcat.sh
+./grabcat.sh appFront appBack
 
 # install war files into tomcat
 cp /home/aspace/archivesspace/frontend/frontend.war appFront/webapps/ROOT.war

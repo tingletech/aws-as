@@ -81,6 +81,7 @@ cat as_role_account.sh >> aws_init.sh
 cat >> aws_init.sh << DELIM
 EOSETUP
 # back on remote machine as root
+chown aspace:aspace ~aspace/init.sh
 chmod 700 ~aspace/init.sh
 # su to aspace and run the payload
 su - -c aspace ~aspace/init.sh

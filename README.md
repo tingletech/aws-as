@@ -10,7 +10,7 @@ The system configuration files in this gist go in `~/aws/`
 
 In the management console, you will need to go to "My Account" >
 "Security Credentials" > "X.509 Certificates" > "Create a new
-Certificate".  Download the .pem files and put them in ~/.ec2 .
+Certificate".  Download the two `.pem` files and put them in `~/.ec2` .
 
 Create a file .dbpass in `~/.ec2` with the password for the database.
 

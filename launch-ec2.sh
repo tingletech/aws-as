@@ -70,7 +70,11 @@ useradd aspace
 # move the application home directory onto the bigger disk
 mv /home/aspace /media/ephemeral0/aspace
 ln -s /media/ephemeral0/aspace /home/aspace
-
+# create script to setup the role account and set permissions
+touch ~aspace/init.sh
+chown aspace:aspace ~aspace/init.sh
+chmod 700 ~aspace/init.sh
+# write the file
 cat > ~aspace/init.sh <<EOSETUP
 DELIM
 # as_role_account.sh is created from as_role_account.sh.template.sh
@@ -85,10 +89,8 @@ cat as_role_account.sh >> aws_init.sh
 cat >> aws_init.sh << DELIM
 EOSETUP
 # back on remote machine as root
-chown aspace:aspace ~aspace/init.sh
-chmod 700 ~aspace/init.sh
 # su to aspace and run the payload
-su - -c aspace ~aspace/init.sh
+su - aspace -c ~aspace/init.sh
 # rm ~aspace/init.sh ## remove the init.sh file when it has run once we have this all working
 
 # redirect port 8080 to port 80 so we don't have to run tomcat as root

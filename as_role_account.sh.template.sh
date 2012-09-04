@@ -46,7 +46,8 @@ DATABASEYML
 # end of database.yml file
 
 ./build/run db:migrate 		# this runs and talks to the mysql in amazon okay
-./build/run backend:war
+./build/run backend:devserver	# did not check if this dev server could connect to RDS!
+./build/run backend:war		# <-- did not try the unconfigured/derby .war files in tomcat
 ./build/run frontend:war
 
 cd ~
@@ -68,6 +69,10 @@ cp ~/archivesspace/backend/backend.war appBack/webapps/ROOT.war
     twincat/appFront/webapps/ROOT/WEB-INF/lib/
 
 # java -DARCHIVESSPACE_BACKEND=localhost:8089 ??  via JAVA_OPTS?
+# front needs to know where the back is
+cat >> appFront/bin/setenv.sh << ASBACKEND
+JAVA_OPTS="-DARCHIVESSPACE_BACKEND=localhost:8083"
+ASBACKEND
 ./twincat/wrapper.sh appFront ./twincat/tomcat/bin/startup.sh
 ./twincat/wrapper.sh appBack ./twincat/tomcat/bin/startup.sh
 

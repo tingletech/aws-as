@@ -56,6 +56,9 @@ make install
 # iotop is a handy utility on linux
 easy_install pip
 pip install http://guichaz.free.fr/iotop/files/iotop-0.4.4.tar.gz
+# glances looks sort of cool http://nicolargo.github.com/glances/ /via http://news.ycombinator.com/item?id=4470590
+yum -y install python-devel
+pip install glances
 
 # _   /|  ack is a tool like grep, optimized for programmers
 # \'o.O'  http://betterthangrep.com

@@ -71,7 +71,7 @@ cp ~/archivesspace/backend/backend.war appBack/webapps/ROOT.war
 # java -DARCHIVESSPACE_BACKEND=localhost:8089 ??  via JAVA_OPTS?
 # front needs to know where the back is
 cat >> appFront/bin/setenv.sh << ASBACKEND
-JAVA_OPTS="-DARCHIVESSPACE_BACKEND=http://localhost:8083"
+JAVA_OPTS="-DARCHIVESSPACE_BACKEND=http://localhost:8082"
 ASBACKEND
 ./twincat/wrapper.sh appFront ./twincat/tomcat/bin/startup.sh
 ./twincat/wrapper.sh appBack ./twincat/tomcat/bin/startup.sh

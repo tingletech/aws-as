@@ -54,10 +54,8 @@ cd ~
 # https://github.com/tingletech/twincat SNAC style ‖tomcat 
 git clone https://github.com/tingletech/twincat.git
 cd twincat
-				# standalone jar will use 8080 and 8089 right now
-export START_LISTEN=8081	# since default 8080 will be used by java -jar archivesspace.jar
 ./grabcat.sh appFront appBack	# this sets up two tomcat servers using the same binary distribution
-				# 8081 is appFront and 8082 is appBack
+				# 8080 is appFront and 8081 is appBack
 # install war files into tomcat
 cp ~/archivesspace/frontend/frontend.war appFront/webapps/ROOT.war
 cp ~/archivesspace/backend/backend.war appBack/webapps/ROOT.war
@@ -71,17 +69,11 @@ cp ~/archivesspace/backend/backend.war appBack/webapps/ROOT.war
 # java -DARCHIVESSPACE_BACKEND=localhost:8089 ??  via JAVA_OPTS?
 # front needs to know where the back is
 cat >> appFront/bin/setenv.sh << ASBACKEND
-JAVA_OPTS="-DARCHIVESSPACE_BACKEND=http://localhost:8082"
+JAVA_OPTS="-DARCHIVESSPACE_BACKEND=http://localhost:8081"
 ASBACKEND
 ./twincat/wrapper.sh appFront ./twincat/tomcat/bin/startup.sh
 ./twincat/wrapper.sh appBack ./twincat/tomcat/bin/startup.sh
 
-# if we are running two tomcats; maybe it will be eaiser to set up in the role account
-# rather than using the tomcat7 that comes with Amazon Linux
-# or... run a tomcat6 and a tomcat7?
-
-# For now, run exactly what gets checked out as a standalone service
-#
 cd ../archivesspace.orig
 ./build/run dist
 mkdir daemonize
@@ -90,4 +82,4 @@ daemonize -c .       \
  -o daemonize/stdout \
  -p daemonize/pid    \
  -l daemonize/lock   \
- /usr/bin/java -jar archivesspace.jar 8080
+ /usr/bin/java -jar archivesspace.jar 8085

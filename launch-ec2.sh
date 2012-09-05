@@ -42,14 +42,6 @@ yum -y install libxslt		# need this for tomcat setup
 # https://github.com/joyent/node/wiki/Installing-Node.js-via-package-manager
 yum -y localinstall --nogpgcheck http://nodejs.tchol.org/repocfg/amzn1/nodejs-stable-release.noarch.rpm 
 yum -y install nodejs-compat-symlinks npm
-# can't find a package for http://software.clapper.org/daemonize/
-# used to run the standalone archivesspace.jar server as a daemon
-cd /usr/local/src
-git clone http://github.com/bmc/daemonize.git
-cd daemonize
-sh configure
-make
-make install
 
 # these aren't strictly nessicary for the application but will be usful for debugging
 
@@ -62,9 +54,9 @@ pip install glances
 
 # _   /|  ack is a tool like grep, optimized for programmers
 # \'o.O'  http://betterthangrep.com
-# =(___)=                                                 not sure exactly what is going on here
-#    U    ack!                                                                   ⇩ ⇩
-curl http://betterthangrep.com/ack-standalone > /usr/local/bin/ack && chmod 0755 !#:3
+# =(___)=
+#    U    ack!
+curl http://betterthangrep.com/ack-standalone > /usr/local/bin/ack && chmod 0755 /usr/local/bin/ack
 
 
 # create role account for the application
@@ -99,8 +91,6 @@ su - aspace -c ~aspace/init.sh
 # redirect port 8080 to port 80 so we don't have to run tomcat as root
 # http://forum.slicehost.com/index.php?p=/discussion/2497/iptables-redirect-port-80-to-port-8080/p1
 iptables -A PREROUTING -t nat -i eth0 -p tcp --dport 80 -j REDIRECT --to-port 8080
-
-# public_address=`curl http://169.254.169.254/latest/meta-data/public-ipv4`
 
 ## chkconfig an init.d script that will start and stop monit
 

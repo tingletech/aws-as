@@ -46,8 +46,7 @@ DATABASEYML
 # end of database.yml file
 
 ./build/run db:migrate 		# this runs and talks to the mysql in amazon okay
-./build/run backend:devserver	# did not check if this dev server could connect to RDS!
-./build/run backend:war		# <-- did not try the unconfigured/derby .war files in tomcat
+./build/run backend:war
 ./build/run frontend:war
 
 cd ~
@@ -61,25 +60,20 @@ cp ~/archivesspace/frontend/frontend.war appFront/webapps/ROOT.war
 cp ~/archivesspace/backend/backend.war appBack/webapps/ROOT.war
 ## hacking around the missing mysql driver...
   cd appFront/webapps
-  unzip ROOT.war
+  mkdir ROOT
+  cd ROOT
+  unzip ../ROOT.war
+  ln -s WEB-INF/config
+  ln -s WEB-INF/common
   cd ~
   cp ~/archivesspace/build/gems/gems/jdbc-mysql-5.1.13/lib/mysql-connector-java-5.1.13.jar \
     twincat/appFront/webapps/ROOT/WEB-INF/lib/
 
 # java -DARCHIVESSPACE_BACKEND=localhost:8089 ??  via JAVA_OPTS?
 # front needs to know where the back is
+cd twincat
 cat >> appFront/bin/setenv.sh << ASBACKEND
 JAVA_OPTS="-DARCHIVESSPACE_BACKEND=http://localhost:8081"
 ASBACKEND
-./twincat/wrapper.sh appFront ./twincat/tomcat/bin/startup.sh
-./twincat/wrapper.sh appBack ./twincat/tomcat/bin/startup.sh
-
-cd ../archivesspace.orig
-./build/run dist
-mkdir daemonize
-daemonize -c .       \
- -e daemonize/stderr \
- -o daemonize/stdout \
- -p daemonize/pid    \
- -l daemonize/lock   \
- /usr/bin/java -jar archivesspace.jar 8085
+./wrapper.sh appFront ./tomcat/bin/startup.sh
+./wrapper.sh appBack ./tomcat/bin/startup.sh

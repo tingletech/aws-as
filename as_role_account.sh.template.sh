@@ -62,7 +62,9 @@ cp ~/archivesspace/backend/backend.war appBack/webapps/ROOT.war
   cd appFront/webapps
   mkdir ROOT
   cd ROOT
-  unzip ../ROOT.war
+  set +e
+  unzip ../ROOT.war	# exit code is "1"
+  set -e
   ln -s WEB-INF/config
   ln -s WEB-INF/common
   cd ~

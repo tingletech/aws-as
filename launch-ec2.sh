@@ -58,6 +58,9 @@ pip install glances
 #    U    ack!
 curl http://betterthangrep.com/ack-standalone > /usr/local/bin/ack && chmod 0755 /usr/local/bin/ack
 
+# redirect port 8080 to port 80 so we don't have to run tomcat as root
+# http://forum.slicehost.com/index.php?p=/discussion/2497/iptables-redirect-port-80-to-port-8080/p1
+iptables -A PREROUTING -t nat -i eth0 -p tcp --dport 80 -j REDIRECT --to-port 8080
 
 # create role account for the application
 useradd aspace
@@ -65,6 +68,7 @@ useradd aspace
 # move the application home directory onto the bigger disk
 mv /home/aspace /media/ephemeral0/aspace
 ln -s /media/ephemeral0/aspace /home/aspace
+
 # create script to setup the role account and set permissions
 touch ~aspace/init.sh
 chown aspace:aspace ~aspace/init.sh
@@ -83,18 +87,9 @@ cat as_role_account.sh >> aws_init.sh
 # finish off the user-data payload file
 cat >> aws_init.sh << DELIM
 EOSETUP
-# back on remote machine as root
-# su to aspace and run the payload
 su - aspace -c ~aspace/init.sh
-# rm ~aspace/init.sh ## remove the init.sh file when it has run once we have this all working
-
-# redirect port 8080 to port 80 so we don't have to run tomcat as root
-# http://forum.slicehost.com/index.php?p=/discussion/2497/iptables-redirect-port-80-to-port-8080/p1
-iptables -A PREROUTING -t nat -i eth0 -p tcp --dport 80 -j REDIRECT --to-port 8080
-
+rm ~aspace/init.sh 
 ## chkconfig an init.d script that will start and stop monit
-
-# send notifications?
 DELIM
 # back to the local machine
 

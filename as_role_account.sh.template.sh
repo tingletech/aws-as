@@ -12,38 +12,10 @@ cd archivesspace
 # create config/config.rb, pointing to the AWS RDS mysql DB that we've started
 cat > config/config.rb << RAILSCONFIG
 AppConfig[:db_url] = "%{DB_URL}"
+AppConfig[:backend_url] = "http://localhost:8081"
+AppConfig[:frontend_url] = "http://localhost:8080"
 RAILSCONFIG
 # end of here file with config.rb (not really sure if this is railsconf)
-
-# now, write a database.yml file
-cat > frontend/config/database.yml << DATABASEYML
-#
-# http://bleything.net/articles/dry-out-your-database-yml.html
-#
-login: &login
-  adapter: mysql
-  encoding: utf8
-  username: aspace
-  password: %{password}
-  host: %{endpoint}
-
-development:
-  <<: *login
-  database: archivesspace
-
-# Warning: The database defined as "test" will be erased and
-# re-generated from your development database when you run "rake".
-# Do not set this db to the same as development or production.
-test:
-  adapter: sqlite3
-  database: db/test.sqlite3
-
-production:
-  <<: *login
-  database: archivesspace
-
-DATABASEYML
-# end of database.yml file
 
 ./build/run db:migrate 		# this runs and talks to the mysql in amazon okay
 ./build/run backend:war
@@ -58,24 +30,5 @@ cd twincat
 # install war files into tomcat
 cp ~/archivesspace/frontend/frontend.war appFront/webapps/ROOT.war
 cp ~/archivesspace/backend/backend.war appBack/webapps/ROOT.war
-## hacking around the missing mysql driver...
-  cd appFront/webapps
-  mkdir ROOT
-  cd ROOT
-  set +e
-  unzip ../ROOT.war	# exit code is "1"
-  set -e
-  ln -s WEB-INF/config
-  ln -s WEB-INF/common
-  cd ~
-  cp ~/archivesspace/build/gems/gems/jdbc-mysql-5.1.13/lib/mysql-connector-java-5.1.13.jar \
-    twincat/appFront/webapps/ROOT/WEB-INF/lib/
-
-# java -DARCHIVESSPACE_BACKEND=localhost:8089 ??  via JAVA_OPTS?
-# front needs to know where the back is
-cd twincat
-cat >> appFront/bin/setenv.sh << ASBACKEND
-JAVA_OPTS="-DARCHIVESSPACE_BACKEND=http://localhost:8081"
-ASBACKEND
 ./wrapper.sh appFront ./tomcat/bin/startup.sh
 ./wrapper.sh appBack ./tomcat/bin/startup.sh

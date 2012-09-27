@@ -33,6 +33,12 @@ Query OK, 0 rows affected (0.00 sec)
 mysql> grant all on at.* to 'XXX'@'%' identified by 'XXX';
 Query OK, 0 rows affected (0.00 sec)
 
+mysql> GRANT SHOW DATABASES, SHOW VIEW, SELECT, LOCK TABLES, RELOAD  ON *.* to backup@localhost  IDENTIFIED BY 'XXX';
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> FLUSH PRIVILEGES;
+Query OK, 0 rows affected (0.00 sec)
+
 ```
 
 Install archon.

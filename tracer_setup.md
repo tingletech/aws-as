@@ -1,4 +1,3 @@
-
 # Set up AT and Archon tracer database
 
 Launch an AWS EC2 c1.medium and ssh to it.

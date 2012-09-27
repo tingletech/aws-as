@@ -1,6 +1,6 @@
 # Set up AT and Archon tracer database
 
-Launch an AWS EC2 c1.medium and ssh to it.
+Launch an AWS EC2 m1.medium and ssh to it.
 
 Update and install packages, start servers.
 

@@ -48,7 +48,7 @@ sudo vi 3.21-r1/Archon/config.inc.php # set database info
 
 ```
 
-Go to the web interface and to the install
+Go to the web interface and to the install; then do this:
 
 ```sh
 sudo mv Archon/packages/core/install/install.php Archon/packages/core/install/install-done.php

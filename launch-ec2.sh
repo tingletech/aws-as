@@ -1,7 +1,7 @@
 #!/bin/bash
 # launch an EC2 server and install application
 # run ./launch-rds.sh first
-set -eux
+set -eu
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )" # http://stackoverflow.com/questions/59895
 . $DIR/setenv.sh
 cd $DIR

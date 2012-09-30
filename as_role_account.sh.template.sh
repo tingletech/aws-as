@@ -32,3 +32,10 @@ cp ~/archivesspace/frontend/frontend.war appFront/webapps/ROOT.war
 cp ~/archivesspace/backend/backend.war appBack/webapps/ROOT.war
 ./wrapper.sh appFront ./tomcat/bin/startup.sh
 ./wrapper.sh appBack ./tomcat/bin/startup.sh
+
+# build unconfigured .jar, remove GPL2.x code, and copy to web root 
+cd
+cd archviesspace.orig
+./build/run dist
+zip archivesspace.jar -d "*mysql-connector*"
+cp archivesspace.jar ../twincat/appFront/webapps/ROOT

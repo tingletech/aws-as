@@ -1,6 +1,6 @@
 #!/bin/bash
 # launch a mysql server on RDS
-set -eux
+set -eu
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )" # http://stackoverflow.com/questions/59895
 . $DIR/setenv.sh
 # http://docs.amazonwebservices.com/AmazonRDS/latest/CommandLineReference/CLIReference-cmd-CreateDBInstance.html

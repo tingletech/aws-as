@@ -35,7 +35,7 @@ cp ~/archivesspace/backend/backend.war appBack/webapps/ROOT.war
 
 # build unconfigured .jar, remove GPL2.x code, and copy to web root 
 cd
-cd archviesspace.orig
+cd archivesspace.orig
 ./build/run dist
 zip archivesspace.jar -d "*mysql-connector*"
 cp archivesspace.jar ../twincat/appFront/webapps/ROOT

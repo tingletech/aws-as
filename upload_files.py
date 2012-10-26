@@ -10,7 +10,7 @@ tag = args.tag[0]
 c = boto.connect_s3()
 fn = 'archivesspace.' + tag + '.jar'
 bw = 'backend.' + tag + '.war'
-fw = 'frontent.' + tag + '.war'
+fw = 'frontend.' + tag + '.war'
 fn_public = 'public-files/'
 fn_private = 'private-files/'
 url_upload_public = c.generate_url(3600, 'PUT', 'archivesspace', fn_public + fn, headers={'x-amz-acl': 'public-read'})
@@ -26,7 +26,6 @@ print 'curl --request PUT --upload-file backend/backend.war "' + url_upload_priv
 print 'curl --request PUT --upload-file frontend/frontend.war "' + url_upload_private_front + '"'
 print 'zip archivesspace.jar -d "*mysql-connector*"'
 print 'zip backend/backend.war -d "*mysql-connector*"'
-print 'zip frontend/frontend.war -d "*mysql-connector*"'
 
 print 'curl --request PUT --upload-file archivesspace.jar -H \'x-amz-acl: public-read\' "' + url_upload_public + '"'
 print 'curl --request PUT --upload-file backend/backend.war -H \'x-amz-acl: public-read\' "' + url_upload_public_back + '"'

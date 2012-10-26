@@ -37,6 +37,8 @@ cd archivesspace
 ./build/run backend:test
 ./build/run common:test
 ./build/run dist
+./build/run backend:war
+./build/run frontend:war
 DELIM
 
 ./upload_files.py $TAG >> aws_builder_init.sh

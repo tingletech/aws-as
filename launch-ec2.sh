@@ -42,6 +42,7 @@ yum -y install libxslt		# need this for tomcat setup
 # https://github.com/joyent/node/wiki/Installing-Node.js-via-package-manager
 yum -y localinstall --nogpgcheck http://nodejs.tchol.org/repocfg/amzn1/nodejs-stable-release.noarch.rpm 
 yum -y install nodejs-compat-symlinks npm
+npm install http-proxy		# reverse proxy for logging posts
 
 # these aren't strictly nessicary for the application but will be usful for debugging
 

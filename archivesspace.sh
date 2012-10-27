@@ -2,6 +2,8 @@
 
 ### BEGIN INIT INFO
 # Provides:          archivesspace
+# Required-Start:    networking
+# Required-Stop:     networking
 # Default-Start:     2 3 4 5
 # Default-Stop:      0 1 6
 # Short-Description: Start archivesspace/ embedded jetty 
@@ -13,16 +15,18 @@ set -e
 # AS_HOME has a default or can be read from environment
 AS_HOME=${AS_HOME-"$HOME/archivesspace"}
 
-PIDFILE=$AS_HOME/archivesspace.pid
-OUTFILE=$AS_HOME/stdout.txt
-ERRFILE=$AS_HOME/stderr.txt
+PIDFILE=$AS_HOME/log/archivesspace.pid
+OUTFILE=$AS_HOME/log/stdout.txt
+ERRFILE=$AS_HOME/log/stderr.txt
 
 case "$1" in
 start)
   set -u
   /usr/local/sbin/daemonize -a -c $AS_HOME -e $ERRFILE -o $OUTFILE -p $PIDFILE -l $PIDFILE \
-    $JAVA_HOME/bin/java -jar $AS_HOME/archivesspace.*.jar 
-    #  -E var=value   Pass environment setting to daemon. May appear multiple times. \
+    $JAVA_HOME/bin/java \ 
+      -Daspace.config=$AS_HOME/config/config.rb \
+      -cp $AS_HOME/lib/mysql-connector-java-*.jar:$AS_HOME/lib/archivesspace.*.jar \
+      org.archivesspace.Main
 ;;
 
 stop)

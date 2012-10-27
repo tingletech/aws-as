@@ -17,11 +17,11 @@ RAILSCONFIG
 # end of here file with config.rb 
 chmod 600 config/config.rb
 
-wget https://raw.github.com/gist/3519687/1aa59bc7009ca79684c58642cb1f4f453a123b99/archivesspace.sh
+wget https://raw.github.com/gist/3519687/archivesspace.sh
 chmod a+x archivesspace.sh
 ./archivesspace.sh start
 
-
+exit
 # set up tomcat style as a backup
 # https://github.com/tingletech/twincat SNAC style ‖tomcat 
 cd

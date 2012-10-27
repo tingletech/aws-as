@@ -7,7 +7,7 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )" # http://stackoverflow.c
 cd $DIR
 
 hackconf() {	# poor man's templates; hard coded parameters
-  sed -e "s,%{DB_URL},$2," -e "s,%{TAG},$3," $1.template.sh > $1
+  sed -e "s,%{DB_URL},$2," -e "s,%{TAG},$3,g" $1.template.sh > $1
 }
 
 # figure out database connection string to put in confing/config.rb
@@ -44,7 +44,8 @@ yum -y localinstall --nogpgcheck http://nodejs.tchol.org/repocfg/amzn1/nodejs-st
 yum -y install nodejs-compat-symlinks npm
 npm install http-proxy		# reverse proxy for logging posts
 
-yum -y install ftp://fr2.rpmfind.net/linux/dag/redhat/el5/en/x86_64/dag/RPMS/daemonize-1.6.0-1.el5.rf.x86_64.rpm
+# yum -y install ftp://fr2.rpmfind.net/linux/dag/redhat/el5/en/x86_64/dag/RPMS/daemonize-1.6.0-1.el5.rf.x86_64.rpm
+yum -y install ftp://rpmfind.net/linux/dag/redhat/el5/en/i386/dag/RPMS/daemonize-1.6.0-1.el5.rf.i386.rpm
 
 # these aren't strictly nessicary for the application but will be usful for debugging
 
@@ -67,10 +68,14 @@ iptables -A PREROUTING -t nat -i eth0 -p tcp --dport 80 -j REDIRECT --to-port 80
 
 # create role account for the application
 useradd aspace
-# remember this is just session storage, this is just for creating a test server
-# move the application home directory onto the bigger disk
-mv /home/aspace /media/ephemeral0/aspace
-ln -s /media/ephemeral0/aspace /home/aspace
+
+# move the application home directory onto the bigger disk if it is there
+if [ -e /media/ephemeral0 ]; then
+  # remember this is just session storage, this is just for creating a test server
+  mv /home/aspace /media/ephemeral0/aspace
+  ln -s /media/ephemeral0/aspace /home/aspace
+fi
+
 
 # create script to setup the role account and set permissions
 touch ~aspace/init.sh
@@ -107,7 +112,7 @@ ec2-run-instances $AMI                \
      --user-data-file aws_init.sh.gz  \
      --key ec2-keypair                \
      --monitor                        \
-     --instance-type m1.small         \
+     --instance-type t1.micro         \
      --availability-zone $ZONE
 
 # clean up

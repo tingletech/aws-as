@@ -27,4 +27,5 @@ export DB_INSTANCE_IDENTIFIER=alpha05
 export TAG="v0.2.0"
 
 # http://aws.amazon.com/amazon-linux-ami/ 
-export AMI=ami-94cd60fd		# this is a 64-bit Amazon Linux AMI with session storage
+# export AMI=ami-94cd60fd		# this is a 64-bit Amazon Linux AMI with session storage
+export AMI=ami-1a249873			# 32 bit with EBS (for t1.micro)

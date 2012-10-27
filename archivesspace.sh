@@ -22,10 +22,10 @@ ERRFILE=$AS_HOME/log/stderr.txt
 case "$1" in
 start)
   set -u
-  /usr/local/sbin/daemonize -a -c $AS_HOME -e $ERRFILE -o $OUTFILE -p $PIDFILE -l $PIDFILE \
-    $JAVA_HOME/bin/java \ 
+  /usr/sbin/daemonize -a -c $AS_HOME -e $ERRFILE -o $OUTFILE -p $PIDFILE -l $PIDFILE \
+    $JAVA_HOME/bin/java \
       -Daspace.config=$AS_HOME/config/config.rb \
-      -cp $AS_HOME/lib/mysql-connector-java-*.jar:$AS_HOME/lib/archivesspace.*.jar \
+      -cp $AS_HOME/lib/mysql-connector-java-5.1.21.jar:$AS_HOME/lib/archivesspace.v0.2.0.jar \
       org.archivesspace.Main
 ;;
 

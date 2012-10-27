@@ -38,6 +38,18 @@ Grab the amazon command line tools.
 ./grabazon.sh
 ```
 
+
+Build the .jar and .war files
+-----------------------------
+
+Launch a m1.large, build the `.jar` and `.war`, push the artifacts to S3, terminate instance.
+
+```sh
+./launch-build.sh
+```
+
+They python library `boto` needs to be set up with the S3 credential for the push to S3 to work.
+
 Launch services on AWS
 ----------------------
 

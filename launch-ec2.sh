@@ -6,8 +6,8 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )" # http://stackoverflow.c
 . $DIR/setenv.sh
 cd $DIR
 
-hackconf() {	# poor man's templates; hard coded for %{DB_URL}, %{password} and %{endpoint}
-  sed -e "s,%{DB_URL},$2," -e "s,%{password},$3," -e "s,%{endpoint},$4," $1.template.sh > $1
+hackconf() {	# poor man's templates; hard coded parameters
+  sed -e "s,%{DB_URL},$2," -e "s,%{TAG},$3," $1.template.sh > $1
 }
 
 # figure out database connection string to put in confing/config.rb
@@ -43,6 +43,8 @@ yum -y install libxslt		# need this for tomcat setup
 yum -y localinstall --nogpgcheck http://nodejs.tchol.org/repocfg/amzn1/nodejs-stable-release.noarch.rpm 
 yum -y install nodejs-compat-symlinks npm
 npm install http-proxy		# reverse proxy for logging posts
+
+yum -y install ftp://fr2.rpmfind.net/linux/dag/redhat/el5/en/x86_64/dag/RPMS/daemonize-1.6.0-1.el5.rf.x86_64.rpm
 
 # these aren't strictly nessicary for the application but will be usful for debugging
 
@@ -81,7 +83,7 @@ DELIM
 # it is run as the aspace role account on the target machine 
 # a poor sed based template system is used (switch to better perl oneliner)
 # to hack sensitive info into the script
-hackconf as_role_account.sh $db_url $password $endpoint
+hackconf as_role_account.sh $db_url $TAG
 # cat the script into the payload
 cat as_role_account.sh >> aws_init.sh 
 

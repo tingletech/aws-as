@@ -12,6 +12,9 @@ cat > aws_builder_init.sh << DELIM
 set -eux
 # this gets run as root on the amazon machine when it boots up
 
+# set up a self destruct in case any of these commands don't work for some reason
+echo halt | at now + 115 minutes
+
 # install packages we need from amazon's repo
 yum -y update			# get the latest security updates
 yum -y install git 
@@ -24,7 +27,6 @@ yum -y install libxslt		# need this for tomcat setup
 # https://github.com/joyent/node/wiki/Installing-Node.js-via-package-manager
 yum -y localinstall --nogpgcheck http://nodejs.tchol.org/repocfg/amzn1/nodejs-stable-release.noarch.rpm 
 yum -y install nodejs-compat-symlinks npm
-npm install http-proxy		# reverse proxy for logging posts
 
 mkdir /media/ephemeral0/aspace
 cd /media/ephemeral0/aspace
@@ -39,15 +41,29 @@ cd archivesspace
 ./build/run dist
 ./build/run backend:war
 ./build/run frontend:war
+zip -q -r build.zip build config
+zip -d build.zip "*mysql-connector*"
 DELIM
 
 ./upload_files.py $TAG >> aws_builder_init.sh
 
 cat >> aws_builder_init.sh << DELIM
+set +e
+# send a notice to irc
+(
+echo NICK cdlbuildbot 
+echo USER cdlbuildbot 8 \* : Notifier
+sleep 10 
+echo 'JOIN #archivesspace'
+sleep 5
+echo "PRIVMSG #archivesspace : $TAG built and files uploaded to s3 https://s3.amazonaws.com/archivesspace/public-files/archivesspace.$TAG.jar"
+sleep 5
+echo QUIT
+sleep 5
+) | nc chat.freenode.net 6667
 halt
 DELIM
 
-## chkconfig an init.d script that will start and stop monit
 # back to the local machine
 
 gzip aws_builder_init.sh

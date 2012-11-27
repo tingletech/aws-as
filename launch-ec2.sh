@@ -33,28 +33,16 @@ set -eux
 # install packages we need from amazon's repo
 yum -y update			# get the latest security updates
 yum -y install git 
-yum -y install ant 		# ant via ./build was crying about tools.jar b/c it was running in JRE
-yum -y install mysql-bench	# assuming this is needed for mysql client??
-# yum -y install monit		# set this up later
-yum -y install tree
-yum -y install libxslt		# need this for tomcat setup
-# node speeds up sprockets asset pipeline generation during build
-# https://github.com/joyent/node/wiki/Installing-Node.js-via-package-manager
-yum -y localinstall --nogpgcheck http://nodejs.tchol.org/repocfg/amzn1/nodejs-stable-release.noarch.rpm 
-yum -y install nodejs-compat-symlinks npm
-npm install http-proxy		# reverse proxy for logging posts
+yum -y install ant 
 
-# yum -y install ftp://fr2.rpmfind.net/linux/dag/redhat/el5/en/x86_64/dag/RPMS/daemonize-1.6.0-1.el5.rf.x86_64.rpm
-yum -y install ftp://rpmfind.net/linux/dag/redhat/el5/en/i386/dag/RPMS/daemonize-1.6.0-1.el5.rf.i386.rpm
+yum -y install ftp://fr2.rpmfind.net/linux/dag/redhat/el5/en/x86_64/dag/RPMS/daemonize-1.6.0-1.el5.rf.x86_64.rpm
+# yum -y install ftp://rpmfind.net/linux/dag/redhat/el5/en/i386/dag/RPMS/daemonize-1.6.0-1.el5.rf.i386.rpm
 
 # these aren't strictly nessicary for the application but will be usful for debugging
 
 # iotop is a handy utility on linux
 easy_install pip
 pip install http://guichaz.free.fr/iotop/files/iotop-0.4.4.tar.gz
-# glances looks sort of cool http://nicolargo.github.com/glances/ /via http://news.ycombinator.com/item?id=4470590
-yum -y install python-devel
-pip install glances
 
 # _   /|  ack is a tool like grep, optimized for programmers
 # \'o.O'  http://betterthangrep.com
@@ -65,6 +53,19 @@ curl http://betterthangrep.com/ack-standalone > /usr/local/bin/ack && chmod 0755
 # redirect port 8080 to port 80 so we don't have to run tomcat as root
 # http://forum.slicehost.com/index.php?p=/discussion/2497/iptables-redirect-port-80-to-port-8080/p1
 iptables -A PREROUTING -t nat -i eth0 -p tcp --dport 80 -j REDIRECT --to-port 8080
+
+# t1.micro's don't come with any swap; let's add 1G
+# http://cloudstory.in/2012/02/adding-swap-space-to-amazon-ec2-linux-micro-instance-to-increase-the-performance/
+# http://www.matb33.me/2012/05/03/wordpress-on-ec2-micro.html
+/bin/dd if=/dev/zero of=/var/swap.1 bs=1M count=1024
+/sbin/mkswap /var/swap.1
+/sbin/swapon /var/swap.1
+# in case we get rebooted, add swap to fstab
+cat >> /etc/fstab << FSTAB
+/var/swap.1 swap swap defaults 0 0
+FSTAB
+# t1.micro memory optimizations
+chkconfig sendmail off
 
 # create role account for the application
 useradd aspace
@@ -107,7 +108,7 @@ rm as_role_account.sh
 
 # http://docs.amazonwebservices.com/AWSEC2/latest/CommandLineReference/ApiReference-cmd-RunInstances.html
 # "You must have the key pair where you run your script." -- https://forums.aws.amazon.com/message.jspa?messageID=88003
-ec2-run-instances $AMI                \
+ec2-run-instances $AMI_EBS            \
      --verbose                        \
      --user-data-file aws_init.sh.gz  \
      --key ec2-keypair                \

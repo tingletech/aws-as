@@ -23,9 +23,9 @@ export JAVA_HOME=$(/usr/libexec/java_home)
 
 export EC2_REGION=us-east-1
 export ZONE=us-east-1b
-export DB_INSTANCE_IDENTIFIER=alpha05
-export TAG="v0.2.0"
+export DB_INSTANCE_IDENTIFIER=alpha07
+export TAG="v0.2.2"
 
 # http://aws.amazon.com/amazon-linux-ami/ 
-# export AMI=ami-94cd60fd		# this is a 64-bit Amazon Linux AMI with session storage
-export AMI=ami-1a249873			# 32 bit with EBS (for t1.micro)
+export AMI=ami-94cd60fd			# this is a 64-bit Amazon Linux AMI with session storage
+export AMI_EBS=ami-1624987f		# 64 bit with EBS (for t1.micro)

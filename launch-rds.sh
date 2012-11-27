@@ -7,6 +7,7 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )" # http://stackoverflow.c
 rds-create-db-instance            \
   $DB_INSTANCE_IDENTIFIER         \
   --db-instance-class db.m1.small \
+  --db-parameter-group-name utf8  \
   --engine MySQL                  \
   --db-name archivesspace         \
   --master-user-password -        \

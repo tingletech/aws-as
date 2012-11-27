@@ -41,7 +41,7 @@ cd archivesspace
 ./build/run dist
 ./build/run backend:war
 ./build/run frontend:war
-zip -q -r build.zip build config
+zip -q -r build.zip build config backend
 zip -d build.zip "*mysql-connector*"
 DELIM
 

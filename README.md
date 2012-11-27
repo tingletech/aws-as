@@ -53,6 +53,20 @@ They python library `boto` needs to be set up with the S3 credential for the pus
 Launch services on AWS
 ----------------------
 
+Set up parameter group for utf8 (just need to do this once).
+
+```sh
+rds-create-db-parameter-group --db-parameter-group-family mysql5.5 --description "utf8" --db-parameter-group-name utf8
+
+rds-modify-db-parameter-group utf8 \
+>     --parameters="name=character_set_server, value=utf8, method=immediate" \
+>     --parameters="name=character_set_client, value=utf8, method=immediate" \
+>     --parameters="name=character_set_results, value=utf8, method=immediate" \
+>     --parameters="name=collation_server, value=utf8_unicode_ci, method=immediate" \
+>     --parameters="name=collation_connection, value=utf8_unicode_ci, method=immediate"
+
+```
+
 Launch an AWS RDS server.
 
 ```sh

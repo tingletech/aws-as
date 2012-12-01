@@ -6,6 +6,7 @@ of an archival management system product on Amazon Web Services.
 
 Installation
 ------------
+
 The system configuration files in this gist go in `~/aws/`
 
 In the management console, you will need to go to "My Account" >
@@ -38,22 +39,17 @@ Grab the amazon command line tools.
 ./grabazon.sh
 ```
 
-
-Build the .jar and .war files
------------------------------
-
-Launch a m1.large, build the `.jar` and `.war`, push the artifacts to S3, terminate instance.
-
-```sh
-./launch-build.sh
-```
-
 They python library `boto` needs to be set up with the S3 credential for the push to S3 to work.
 
-Launch services on AWS
-----------------------
+grant access (security groups left as an exercise for the reader)
 
-Set up parameter group for utf8 (just need to do this once).
+```
+ec2-authorize blah -p 22
+ec2-authorize blah -p 80
+rds-authorize-db-security-group-ingress blah --ec2-security-group-name blah --ec2-security-group-owner-id 8675309
+```
+
+Set up RDS parameter group for utf8
 
 ```sh
 rds-create-db-parameter-group --db-parameter-group-family mysql5.5 --description "utf8" --db-parameter-group-name utf8
@@ -67,7 +63,19 @@ rds-modify-db-parameter-group utf8 \
 
 ```
 
-Launch an AWS RDS server.
+## Every new release
+
+Build the .jar and .war files
+-----------------------------
+
+Launch a m1.large, build the `.jar` and `.war`, push the artifacts to S3, terminate instance.
+
+```sh
+./launch-build.sh
+```
+
+Launch mysql on AWS RDS
+----------------------
 
 ```sh
 ./launch-rds.sh
@@ -90,16 +98,11 @@ DBINSTANCE  alpha01  2012-08-31T20:27:02.502Z  db.m1.small  mysql  10  aspace  b
       OPTIONGROUP  default:mysql-5-5  in-sync
 ```
 
-grant access (security groups left as an exercise for the reader)
-
-```
-ec2-authorize blah -p 22
-ec2-authorize blah -p 80
-rds-authorize-db-security-group-ingress blah --ec2-security-group-name blah --ec2-security-group-owner-id 8675309
-
-```
 
 Launch the EC2 server.
+----------------------
+
+Once the database is running the build artifacts are on s3. 
 
 ```sh
 ./launch-ec2.sh

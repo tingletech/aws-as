@@ -21,7 +21,9 @@ chmod 600 config/config.rb
 unzip as-build.zip
 ./build/run db:migrate
 
-wget https://raw.github.com/gist/3519687/archivesspace.sh
+# wget https://raw.github.com/gist/3519687/archivesspace.sh
+# need a better way to do this ... keep having to update the version
+wget https://raw.github.com/tingletech/aws-as/master/archivesspace.sh
 chmod a+x archivesspace.sh
 ./archivesspace.sh start
 

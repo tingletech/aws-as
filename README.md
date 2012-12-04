@@ -39,7 +39,7 @@ Grab the amazon command line tools.
 ./grabazon.sh
 ```
 
-They python library `boto` needs to be set up with the S3 credential for the push to S3 to work.
+The python library `boto` needs to be set up with the S3 credential for the push to S3 to work.
 
 grant access (security groups left as an exercise for the reader)
 

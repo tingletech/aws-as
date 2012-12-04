@@ -15,21 +15,13 @@ set -eux
 # set up a self destruct in case any of these commands don't work for some reason
 echo halt | at now + 115 minutes
 
-# install packages we need from amazon's repo
-yum -y update			# get the latest security updates
-yum -y install git 
-yum -y install ant 		# ant via ./build was crying about tools.jar b/c it was running in JRE
-yum -y install mysql-bench	# assuming this is needed for mysql client??
-# yum -y install monit		# set this up later
-yum -y install tree
-yum -y install libxslt		# need this for tomcat setup
-# node speeds up sprockets asset pipeline generation during build
-# https://github.com/joyent/node/wiki/Installing-Node.js-via-package-manager
-yum -y localinstall --nogpgcheck http://nodejs.tchol.org/repocfg/amzn1/nodejs-stable-release.noarch.rpm 
-yum -y install nodejs-compat-symlinks npm
+# mkdir /media/ephemeral0/aspace
+# cd /media/ephemeral0/aspace
 
-mkdir /media/ephemeral0/aspace
-cd /media/ephemeral0/aspace
+apt-get -y install xvfb firefox imagemagick
+apt-get -y install nodejs
+apt-get -y install git zip
+apt-get -y install openjdk-6-jdk
 
 git clone https://github.com/archivesspace/archivesspace.git
 cd archivesspace
@@ -37,7 +29,9 @@ cd archivesspace
 ./build/run backend:integration 
 ./build/run backend:doc
 ./build/run backend:test
+./build/run backend:coverage
 ./build/run common:test
+SCREENSHOT_ON_ERROR=1 xvfb-run --server-args="-screen 0 1024x768x24" ./build/run selenium:test
 ./build/run dist
 ./build/run backend:war
 ./build/run frontend:war

@@ -15,8 +15,8 @@ password=`cat ~/.ec2/.dbpass`
 # get the hostname for the database
 endpoint=`rds-describe-db-instances $DB_INSTANCE_IDENTIFIER | head -1 | awk '{ print $9 }'`
 
-db_url="jdbc:mysql://$endpoint:3306/archivesspace?user=aspace\&password=$password"
-#                                                            ^ escaped for regex ...
+db_url="jdbc:mysql://$endpoint:3306/archivesspace?user=aspace\&password=$password\&useUnicode=true\&characterEncoding=UTF-8"
+#                                                            ^ escaped & as \& for regex ...
 
 if [ -z "$endpoint" ]; then		# not sure why set -u is not catching this
   echo "no endpoint, did you run launch-rds.sh?"
@@ -35,7 +35,7 @@ yum -y update			# get the latest security updates
 yum -y install git 
 yum -y install ant 
 
-yum -y install ftp://fr2.rpmfind.net/linux/dag/redhat/el5/en/x86_64/dag/RPMS/daemonize-1.6.0-1.el5.rf.x86_64.rpm
+yum -y install http://fr2.rpmfind.net/linux/dag/redhat/el5/en/x86_64/dag/RPMS/daemonize-1.6.0-1.el5.rf.x86_64.rpm
 # yum -y install ftp://rpmfind.net/linux/dag/redhat/el5/en/i386/dag/RPMS/daemonize-1.6.0-1.el5.rf.i386.rpm
 
 # these aren't strictly nessicary for the application but will be usful for debugging
@@ -108,6 +108,7 @@ rm as_role_account.sh
 
 # http://docs.amazonwebservices.com/AWSEC2/latest/CommandLineReference/ApiReference-cmd-RunInstances.html
 # "You must have the key pair where you run your script." -- https://forums.aws.amazon.com/message.jspa?messageID=88003
+# ec2-run-instances $AMI            \
 ec2-run-instances $AMI_EBS            \
      --verbose                        \
      --user-data-file aws_init.sh.gz  \

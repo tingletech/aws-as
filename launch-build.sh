@@ -22,6 +22,10 @@ apt-get -y install xvfb firefox imagemagick
 apt-get -y install nodejs
 apt-get -y install git zip
 apt-get -y install openjdk-6-jdk
+# for blitz.io
+apt-get -y install rubygems
+gem install blitz
+iptables -A PREROUTING -t nat -i eth0 -p tcp --dport 80 -j REDIRECT --to-port 8080
 
 git clone https://github.com/archivesspace/archivesspace.git
 cd archivesspace
@@ -42,6 +46,21 @@ DELIM
 ./upload_files.py $TAG >> aws_builder_init.sh
 
 cat >> aws_builder_init.sh << DELIM
+## blitz
+blitz api:init <<EEOOMM
+DELIM
+head -2 ~/.ec2/blitz.txt >> aws_builder_init.sh 
+cat >> aws_builder_init.sh << DELIM
+
+EEOOMM
+export PUBLIC_IP=\`curl http://instance-data/latest/meta-data/public-ipv4\`
+# do a sprint
+blitz -p 1-125:60 -T 5000 http://\$PUBLIC_IP/
+echo '42' > /root/ArchivesSpace/tmp/jetty-0.0.0.0-8080-frontend-_-any-/webapp/$BLITZ_RUSH
+sleep 5
+# do a rush
+blitz curl -p 1-500:60 -T 5000 http://\$PUBLIC_IP/
+
 set +e
 # send a notice to irc
 (
@@ -55,6 +74,7 @@ sleep 5
 echo QUIT
 sleep 5
 ) | nc chat.freenode.net 6667
+
 halt
 DELIM
 
@@ -64,7 +84,7 @@ gzip aws_builder_init.sh
 
 # http://docs.amazonwebservices.com/AWSEC2/latest/CommandLineReference/ApiReference-cmd-RunInstances.html
 # "You must have the key pair where you run your script." -- https://forums.aws.amazon.com/message.jspa?messageID=88003
-ec2-run-instances $AMI                \
+ec2-run-instances $UB_IN_AMI          \
      --verbose                        \
      --user-data-file aws_builder_init.sh.gz  \
      --key ec2-keypair                \

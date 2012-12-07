@@ -13,6 +13,8 @@ export EC2_URL=http://ec2.us-east-1.amazonaws.com
 export EC2_PRIVATE_KEY=`ls ~/.ec2/pk-*.pem`
 export EC2_CERT=`ls ~/.ec2/cert-*.pem`
 
+export BLITZ_RUSH=`tail -1 ~/.ec2/blitz.txt`
+
 # command line tools for the relation database service
 # http://s3.amazonaws.com/rds-downloads/RDSCli.zip
 export AWS_RDS_HOME=~/aws/RDSCli-1.9.001
@@ -23,9 +25,10 @@ export JAVA_HOME=$(/usr/libexec/java_home)
 
 export EC2_REGION=us-east-1
 export ZONE=us-east-1b
-export DB_INSTANCE_IDENTIFIER=alpha07
-export TAG="v0.2.2"
+export DB_INSTANCE_IDENTIFIER=alpha08
+export TAG="v0.2.3"
 
 # http://aws.amazon.com/amazon-linux-ami/ 
 export AMI=ami-94cd60fd			# this is a 64-bit Amazon Linux AMI with session storage
+export UB_IN_AMI=ami-e864da81
 export AMI_EBS=ami-1624987f		# 64 bit with EBS (for t1.micro)

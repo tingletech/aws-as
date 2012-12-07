@@ -29,6 +29,6 @@ export DB_INSTANCE_IDENTIFIER=alpha08
 export TAG="v0.2.3"
 
 # http://aws.amazon.com/amazon-linux-ami/ 
-export AMI=ami-94cd60fd			# this is a 64-bit Amazon Linux AMI with session storage
-export UB_IN_AMI=ami-e864da81
-export AMI_EBS=ami-1624987f		# 64 bit with EBS (for t1.micro)
+export AMI=ami-94cd60fd			# this is a 64-bit Amazon Linux AMI with session storage (m1.)
+export UB_IN_AMI=ami-e864da81		# Ubuntu AMIs for EC2 http://alestic.com for build machine (sesion)
+export AMI_EBS=ami-1624987f		# 64 bit with EBS (for t1.micro) (Amazon Linux AMI)

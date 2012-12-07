@@ -13,7 +13,7 @@ set -eux
 # this gets run as root on the amazon machine when it boots up
 
 # set up a self destruct in case any of these commands don't work for some reason
-echo halt | at now + 115 minutes
+echo halt | at now + 175 minutes
 
 # mkdir /media/ephemeral0/aspace
 # cd /media/ephemeral0/aspace

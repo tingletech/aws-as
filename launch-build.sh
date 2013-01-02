@@ -12,6 +12,9 @@ cat > aws_builder_init.sh << DELIM
 set -eux
 # this gets run as root on the amazon machine when it boots up
 
+# let's log http://alestic.com/2010/12/ec2-user-data-output
+exec > >(tee /var/log/user-data.log|logger -t user-data -s 2>/dev/console) 2>&1
+
 # set up a self destruct in case any of these commands don't work for some reason
 echo halt | at now + 175 minutes
 
@@ -46,22 +49,6 @@ DELIM
 ./upload_files.py $TAG >> aws_builder_init.sh
 
 cat >> aws_builder_init.sh << DELIM
-## blitz
-blitz api:init <<EEOOMM
-DELIM
-head -2 ~/.ec2/blitz.txt >> aws_builder_init.sh 
-cat >> aws_builder_init.sh << DELIM
-
-EEOOMM
-export PUBLIC_IP=\`curl http://instance-data/latest/meta-data/public-ipv4\`
-# do a sprint
-blitz -p 1-125:60 -T 5000 http://\$PUBLIC_IP/
-echo '42' > /root/ArchivesSpace/tmp/jetty-0.0.0.0-8080-frontend-_-any-/webapp/$BLITZ_RUSH
-sleep 5
-# do a rush
-blitz curl -p 1-500:60 -T 5000 http://\$PUBLIC_IP/
-
-set +e
 # send a notice to irc
 (
 echo NICK cdlbuildbot 
@@ -74,8 +61,28 @@ sleep 5
 echo QUIT
 sleep 5
 ) | nc chat.freenode.net 6667
-
 halt
+set -e
+## blitz
+blitz api:init <<EEOOMM
+DELIM
+head -2 ~/.ec2/blitz.txt >> aws_builder_init.sh 
+cat >> aws_builder_init.sh << DELIM
+
+EEOOMM
+set +e
+
+# do blitz test
+export PUBLIC_IP=\`curl http://instance-data/latest/meta-data/public-ipv4\`
+java -jar archivesspace.jar > /dev/null 2>&1 &
+sleep 90
+# do a sprint
+blitz curl -T 5000 http://\$PUBLIC_IP/
+echo '42' > /root/ArchivesSpace/tmp/jetty-0.0.0.0-8080-frontend-_-any-/webapp/$BLITZ_RUSH
+sleep 5
+# do a rush
+blitz curl -p 1-500:60 -T 5000 http://\$PUBLIC_IP/
+
 DELIM
 
 # back to the local machine

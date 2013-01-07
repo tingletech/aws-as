@@ -62,15 +62,15 @@ echo QUIT
 sleep 5
 ) | nc chat.freenode.net 6667
 halt
-set -e
+#set -e
 ## blitz
-blitz api:init <<EEOOMM
-DELIM
-head -2 ~/.ec2/blitz.txt >> aws_builder_init.sh 
-cat >> aws_builder_init.sh << DELIM
-
-EEOOMM
-set +e
+#blitz api:init <<EEOOMM
+#DELIM
+#head -2 ~/.ec2/blitz.txt >> aws_builder_init.sh 
+#cat >> aws_builder_init.sh << DELIM
+#
+#EEOOMM
+#set +e
 
 # do blitz test
 export PUBLIC_IP=\`curl http://instance-data/latest/meta-data/public-ipv4\`

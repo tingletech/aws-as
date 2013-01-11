@@ -4,7 +4,7 @@ set -eux
 mkdir archivesspace
 cd archivesspace
 mkdir lib
-curl https://archivesspace.s3.amazonaws.com/public-files/archivesspace.%{TAG}.jar -o lib/archivesspace.%{TAG}.jar
+curl https://archivesspace.s3.amazonaws.com/public-files/archivesspace.%{TAG}.jar -o lib/archivesspace.jar
 curl http://repo1.maven.org/maven2/mysql/mysql-connector-java/5.1.21/mysql-connector-java-5.1.21.jar -o lib/mysql-connector-java-5.1.21.jar
 curl https://s3.amazonaws.com/archivesspace/public-files/as-build.%{TAG}.zip -o as-build.zip
 mkdir log

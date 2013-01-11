@@ -25,7 +25,7 @@ start)
   /usr/sbin/daemonize -a -c $AS_HOME -e $ERRFILE -o $OUTFILE -p $PIDFILE -l $PIDFILE \
     $JAVA_HOME/bin/java \
       -Daspace.config=$AS_HOME/config/config.rb \
-      -cp $AS_HOME/lib/mysql-connector-java-5.1.21.jar:$AS_HOME/lib/archivesspace.v0.3.1.jar \
+      -cp $AS_HOME/lib/mysql-connector-java-5.1.21.jar:$AS_HOME/lib/archivesspace.jar \
       org.archivesspace.Main
 ;;
 

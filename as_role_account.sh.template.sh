@@ -5,6 +5,12 @@ mkdir archivesspace
 cd archivesspace
 mkdir lib
 curl https://archivesspace.s3.amazonaws.com/public-files/archivesspace.%{TAG}.jar -o lib/archivesspace.jar
+mkdir -p lib/frontend/WEB-INF/app/views/site/
+curl https://raw.github.com/tingletech/aws-as/master/_footer.html.erb -o frontend/WEB-INF/app/views/site/_footer.html.erb
+cd lib
+zip -u archivesspace.jar frontend/WEB-INF/app/views/site/_footer.html.erb
+cd ..
+wget https://raw.github.com/tingletech/aws-as/master/_footer.html.erb -o lib/_footer.html.erb
 curl http://repo1.maven.org/maven2/mysql/mysql-connector-java/5.1.21/mysql-connector-java-5.1.21.jar -o lib/mysql-connector-java-5.1.21.jar
 curl https://s3.amazonaws.com/archivesspace/public-files/as-build.%{TAG}.zip -o as-build.zip
 mkdir log

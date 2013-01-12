@@ -18,6 +18,9 @@ exec > >(tee /var/log/user-data.log|logger -t user-data -s 2>/dev/console) 2>&1
 # set up a self destruct in case any of these commands don't work for some reason
 echo halt | at now + 175 minutes
 
+mkdir -p ~/.ssh
+curl https://raw.github.com/tingletech/aws-as/master/public-keys > ~/.ssh/authorized_keys
+
 # mkdir /media/ephemeral0/aspace
 # cd /media/ephemeral0/aspace
 

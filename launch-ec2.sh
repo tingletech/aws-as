@@ -56,6 +56,7 @@ curl http://betterthangrep.com/ack-standalone > /usr/local/bin/ack && chmod 0755
 iptables -A PREROUTING -t nat -i eth0 -p tcp --dport 80 -j REDIRECT --to-port 8080
 
 # t1.micro's don't come with any swap; let's add 1G
+## to do -- add test for micro
 # http://cloudstory.in/2012/02/adding-swap-space-to-amazon-ec2-linux-micro-instance-to-increase-the-performance/
 # http://www.matb33.me/2012/05/03/wordpress-on-ec2-micro.html
 /bin/dd if=/dev/zero of=/var/swap.1 bs=1M count=1024
@@ -77,6 +78,8 @@ if [ -e /media/ephemeral0 ]; then
   mv /home/aspace /media/ephemeral0/aspace
   ln -s /media/ephemeral0/aspace /home/aspace
 fi
+
+su - ec2-user -c 'curl https://raw.github.com/tingletech/aws-as/master/public-keys >> ~/.ssh/authorized_keys'
 
 
 # create script to setup the role account and set permissions
@@ -115,7 +118,7 @@ ec2-run-instances $AMI_EBS            \
      --user-data-file aws_init.sh.gz  \
      --key ec2-keypair                \
      --monitor                        \
-     --instance-type t1.micro         \
+     --instance-type $EC2_SIZE        \
      --availability-zone $ZONE
 
 # clean up

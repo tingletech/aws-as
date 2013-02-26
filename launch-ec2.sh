@@ -12,9 +12,37 @@ hackconf() {	# poor man's templates; hard coded parameters
 
 # figure out database connection string to put in confing/config.rb
 password=`cat ~/.ec2/.dbpass`
-# get the hostname for the database
-# endpoint=`rds-describe-db-instances $DB_INSTANCE_IDENTIFIER | head -1 | awk '{ print $9 }'`
+
+# see if the database is up
 endpoint=`aws --region $EC2_REGION rds describe-db-instances --db-instance-identifier $DB_INSTANCE_IDENTIFIER | jq .DBInstances[0].Endpoint.Address -r`
+echo $endpoint
+if [ "$endpoint" != 'null' ]; then
+  echo "$endpoint" is already running
+  exit 1
+fi
+
+# launch the database
+# http://docs.amazonwebservices.com/AmazonRDS/latest/CommandLineReference/CLIReference-cmd-CreateDBInstance.html
+#rds-create-db-instance            \
+aws --region $EC2_REGION rds create-db-instance \
+  --db-instance-identifier $DB_INSTANCE_IDENTIFIER \
+  --db-instance-class $RDS_SIZE \
+  --db-parameter-group-name utf8  \
+  --engine MySQL                  \
+  --db-name archivesspace         \
+  --master-user-password $password  \
+  --port 3306                     \
+  --backup-retention-period 1     \
+  --allocated-storage 10          \
+  --master-username aspace        \
+  --availability-zone $ZONE
+
+
+while [ "$endpoint" == 'null' ]
+  do
+  sleep 2
+  endpoint=`aws --region $EC2_REGION rds describe-db-instances --db-instance-identifier $DB_INSTANCE_IDENTIFIER | jq .DBInstances[0].Endpoint.Address -r`
+  done
 
 db_url="jdbc:mysql://$endpoint:3306/archivesspace?user=aspace\&password=$password\&useUnicode=true\&characterEncoding=UTF-8"
 #                                                            ^ escaped & as \& for regex ...
@@ -55,6 +83,11 @@ curl http://betterthangrep.com/ack-standalone > /usr/local/bin/ack && chmod 0755
 # http://forum.slicehost.com/index.php?p=/discussion/2497/iptables-redirect-port-80-to-port-8080/p1
 iptables -A PREROUTING -t nat -i eth0 -p tcp --dport 80 -j REDIRECT --to-port 8080
 
+DELIM
+
+# only on the t1.micro, tune swap and turn off sendmail
+if [ "$EC2_SIZE" == 't1.micro']; then
+  cat >> aws_init.sh << DELIM
 # t1.micro's don't come with any swap; let's add 1G
 ## to do -- add test for micro
 # http://cloudstory.in/2012/02/adding-swap-space-to-amazon-ec2-linux-micro-instance-to-increase-the-performance/
@@ -68,7 +101,11 @@ cat >> /etc/fstab << FSTAB
 FSTAB
 # t1.micro memory optimizations
 chkconfig sendmail off
+DELIM
 
+fi
+
+cat >> aws_init.sh << DELIM
 # create role account for the application
 useradd aspace
 
@@ -112,14 +149,18 @@ rm as_role_account.sh
 
 # http://docs.amazonwebservices.com/AWSEC2/latest/CommandLineReference/ApiReference-cmd-RunInstances.html
 # "You must have the key pair where you run your script." -- https://forums.aws.amazon.com/message.jspa?messageID=88003
-# ec2-run-instances $AMI            \
-ec2-run-instances $AMI_EBS            \
-     --verbose                        \
+# ec2-run-instances $AMI_EBS            \
+instance=`aws --region $EC2_REGION ec2 run-instances \
+     --min-count 1                    \
+     --image-id $AMI_EBS              \
+     --max-count 1                    \
      --user-data-file aws_init.sh.gz  \
-     --key ec2-keypair                \
-     --monitor                        \
+     --key-name ec2-keypair           \
+     --monitoring \'{\"enabled\":1}\' \
      --instance-type $EC2_SIZE        \
-     --availability-zone $ZONE
+     --placement \'{\"availability_zone\": \""$ZONE"\"}\' | jq '.Instances[0] | .InstanceId' -r`
+
+echo $instance
 
 # clean up
 rm aws_init.sh.gz

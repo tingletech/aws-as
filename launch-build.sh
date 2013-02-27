@@ -18,7 +18,7 @@ exec > >(tee /var/log/user-data.log|logger -t user-data -s 2>/dev/console) 2>&1
 # set up a self destruct in case any of these commands don't work for some reason
 echo halt | at now + 175 minutes
 
-su - ec2-user -c 'curl https://raw.github.com/tingletech/aws-as/master/public-keys >> ~/.ssh/authorized_keys'
+su - ubuntu -c 'curl https://raw.github.com/tingletech/aws-as/master/public-keys >> ~/.ssh/authorized_keys'
 
 # mkdir /media/ephemeral0/aspace
 # cd /media/ephemeral0/aspace
@@ -41,6 +41,7 @@ cd archivesspace
 ./build/run backend:coverage
 ./build/run common:test
 SCREENSHOT_ON_ERROR=1 xvfb-run --server-args="-screen 0 1024x768x24" ./build/run selenium:test
+SCREENSHOT_ON_ERROR=1 xvfb-run --server-args="-screen 0 1024x768x24" ./build/run selenium:public:test
 ./build/run dist
 ./build/run backend:war
 ./build/run frontend:war

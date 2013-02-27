@@ -29,24 +29,22 @@ unzip as-build.zip
 
 # wget https://raw.github.com/gist/3519687/archivesspace.sh
 # need a better way to do this ... keep having to update the version
-# wget https://raw.github.com/tingletech/aws-as/master/archivesspace.sh
-# chmod a+x archivesspace.sh
-# ./archivesspace.sh start
+wget https://raw.github.com/tingletech/aws-as/master/archivesspace.sh
+chmod a+x archivesspace.sh
+./archivesspace.sh start
 
+exit
 # set up tomcat style as a backup
 # https://github.com/tingletech/twincat SNAC style ‖tomcat 
 cd
 git clone https://github.com/tingletech/twincat.git
 cd twincat
-./grabcat.sh appFront appBack public	# this sets up two tomcat servers using the same binary distribution
+./grabcat.sh appFront appBack	# this sets up two tomcat servers using the same binary distribution
 				# 8080 is appFront and 8081 is appBack
 # install war files into tomcat
 curl https://archivesspace.s3.amazonaws.com/public-files/frontend.%{TAG}.war -o appFront/webapps/ROOT.war
 curl https://archivesspace.s3.amazonaws.com/public-files/backend.%{TAG}.war -o appBack/webapps/ROOT.war
-curl https://archivesspace.s3.amazonaws.com/public-files/public.%{TAG}.war -o public/webapps/ROOT.war
 cp -p ~/config/config.rb appFront/conf
 cp -p ~/config/config.rb appBack/conf
-cp -p ~/config/config.rb public/conf
-./wrapper.sh appFront ./tomcat/bin/startup.sh
-./wrapper.sh appBack ./tomcat/bin/startup.sh
-./wrapper.sh public ./tomcat/bin/startup.sh
+# ./wrapper.sh appFront ./tomcat/bin/startup.sh
+# ./wrapper.sh appBack ./tomcat/bin/startup.sh

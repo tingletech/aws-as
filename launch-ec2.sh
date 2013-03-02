@@ -1,6 +1,5 @@
 #!/bin/bash
 # launch an EC2 server and install application
-# run ./launch-rds.sh first
 set -eu
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )" # http://stackoverflow.com/questions/59895
 . $DIR/setenv.sh
@@ -180,7 +179,7 @@ instance=`$command | jq '.Instances[0] | .InstanceId' -r`
 
 hostname=`aws ec2 describe-instances --instance-ids $instance | jq ' .Reservations[0] | .Instances[0] | .PublicDnsName'` 
 echo "instance started, waiting for hostname"
-while [ "$hostname" == 'null' ]
+while [ "$hostname" = '""' ]
   do
   sleep 15
   echo "."

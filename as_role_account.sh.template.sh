@@ -20,6 +20,9 @@ cat > config/config.rb << RAILSCONFIG
 AppConfig[:db_url] = "%{DB_URL}"
 AppConfig[:backend_url] = "http://localhost:8081"
 AppConfig[:frontend_url] = "http://localhost:8080"
+AppConfig[:public_url] = "http://localhost:8082"
+AppConfig[:search_user_secret] = "yea,this,is,secure"
+AppConfig[:public_user_secret] = "secure,is,this,yea"
 RAILSCONFIG
 # end of here file with config.rb 
 chmod 600 config/config.rb
@@ -44,9 +47,12 @@ cd twincat
 curl https://archivesspace.s3.amazonaws.com/public-files/frontend.%{TAG}.war -o appFront/webapps/ROOT.war
 curl https://archivesspace.s3.amazonaws.com/public-files/backend.%{TAG}.war -o appBack/webapps/ROOT.war
 curl https://archivesspace.s3.amazonaws.com/public-files/public.%{TAG}.war -o public/webapps/ROOT.war
-cp -p ~/config/config.rb appFront/conf
-cp -p ~/config/config.rb appBack/conf
-cp -p ~/config/config.rb public/conf
+cp -p ~/archivesspace/config/config.rb appFront/conf
+cp -p ~/archivesspace/config/config.rb appBack/conf
+cp -p ~/archivesspace/config/config.rb public/conf
+cp -p ~/archivesspace/lib/mysql-connector-java-5.1.21.jar tomcat/lib/
 ./wrapper.sh appFront ./tomcat/bin/startup.sh
 ./wrapper.sh appBack ./tomcat/bin/startup.sh
 ./wrapper.sh public ./tomcat/bin/startup.sh
+sleep 30
+curl -v -X POST http://localhost:8081/setup/update_schema

@@ -47,12 +47,18 @@ cd twincat
 curl https://archivesspace.s3.amazonaws.com/public-files/frontend.%{TAG}.war -o appFront/webapps/ROOT.war
 curl https://archivesspace.s3.amazonaws.com/public-files/backend.%{TAG}.war -o appBack/webapps/ROOT.war
 curl https://archivesspace.s3.amazonaws.com/public-files/public.%{TAG}.war -o public/webapps/ROOT.war
+# this used to work to set up the conf file
 cp -p ~/archivesspace/config/config.rb appFront/conf
 cp -p ~/archivesspace/config/config.rb appBack/conf
 cp -p ~/archivesspace/config/config.rb public/conf
+# install the GPL mysql library
 cp -p ~/archivesspace/lib/mysql-connector-java-5.1.21.jar tomcat/lib/
+# tweak the template
+curl https://raw.github.com/tingletech/aws-as/master/_footer.html.erb -o appFront/webapps/ROOT/WEB-INF/app/views/site/_footer.html.erb
+# start up the tomcats
 ./wrapper.sh appFront ./tomcat/bin/startup.sh
 ./wrapper.sh appBack ./tomcat/bin/startup.sh
 ./wrapper.sh public ./tomcat/bin/startup.sh
 sleep 30
+# migrate the database
 curl -v -X POST http://localhost:8081/setup/update_schema

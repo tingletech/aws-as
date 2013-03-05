@@ -6,7 +6,7 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )" # http://stackoverflow.c
 cd $DIR
 
 hackconf() {	# poor man's templates; hard coded parameters
-  sed -e "s,%{DB_URL},$2," -e "s,%{TAG},$3,g" $1.template.sh > $1
+  sed -e "s,%{DB_URL},$2," -e "s,%{TAG},$3,g" -e "s,%{PW1},$4," -e "s,%{PW2},$5," $1.template.sh > $1
 }
 
 # figure out database connection string to put in confing/config.rb
@@ -46,7 +46,7 @@ if [ "$endpoint" != 'null' ]
 fi
 
 
-while [ "$endpoint" == 'null' ]
+while [ "$endpoint" == 'null' or -z "$endpoint" ]
   do
   sleep 15 
   echo "."
@@ -94,10 +94,11 @@ curl http://betterthangrep.com/ack-standalone > /usr/local/bin/ack && chmod 0755
 # redirect port 8080 to port 80 so we don't have to run tomcat as root
 # http://forum.slicehost.com/index.php?p=/discussion/2497/iptables-redirect-port-80-to-port-8080/p1
 iptables -A PREROUTING -t nat -i eth0 -p tcp --dport 80 -j REDIRECT --to-port 8080
+chkconfig sendmail off
 
 DELIM
 
-# only on the t1.micro, tune swap and turn off sendmail
+# only on the t1.micro, tune swap
 if [ "$EC2_SIZE" == 't1.micro' ]; then
   cat >> aws_init.sh << DELIM
 # t1.micro's don't come with any swap; let's add 1G
@@ -112,7 +113,6 @@ cat >> /etc/fstab << FSTAB
 /var/swap.1 swap swap defaults 0 0
 FSTAB
 # t1.micro memory optimizations
-chkconfig sendmail off
 DELIM
 
 fi
@@ -142,7 +142,7 @@ DELIM
 # it is run as the aspace role account on the target machine 
 # a poor sed based template system is used (switch to better perl oneliner)
 # to hack sensitive info into the script
-hackconf as_role_account.sh $db_url $TAG
+hackconf as_role_account.sh $db_url $TAG `uuidgen` `uuidgen`
 # cat the script into the payload
 cat as_role_account.sh >> aws_init.sh 
 

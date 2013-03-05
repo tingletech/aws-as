@@ -76,17 +76,6 @@ halt
 #EEOOMM
 #set +e
 
-# do blitz test
-export PUBLIC_IP=\`curl http://instance-data/latest/meta-data/public-ipv4\`
-java -jar archivesspace.jar > /dev/null 2>&1 &
-sleep 90
-# do a sprint
-blitz curl -T 5000 http://\$PUBLIC_IP/
-echo '42' > /root/ArchivesSpace/tmp/jetty-0.0.0.0-8080-frontend-_-any-/webapp/$BLITZ_RUSH
-sleep 5
-# do a rush
-blitz curl -p 1-500:60 -T 5000 http://\$PUBLIC_IP/
-
 DELIM
 
 # back to the local machine

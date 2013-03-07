@@ -113,8 +113,8 @@ cd appFront/webapps
 curl https://raw.github.com/tingletech/aws-as/master/_footer.html.erb -o ROOT/WEB-INF/app/views/site/_footer.html.erb
 echo "%{TAG}" >> ROOT/WEB-INF/app/views/site/_footer.html.erb
 ## need to put a sed in here to switch out the URL for the help documentation
-## sed -e ... http://aspace.hudmol.com/help/Default.htm  http://www.archivesspace.org/get-involved/software-testing-help/  ROOT/WEB-INF/config/help.yml
-
+## this is only happening in the tomcat/ not the .jar
+sed -i 's#http://aspace.hudmol.com/help/Default.*htm#http://www.archivesspace.org/get-involved/software-testing-help/#g' ROOT/WEB-INF/config/help.yml
 
 # set up tomcats
 # \\\$ is required in the template to escape \$ in the install script to escape to $ in tomcat setenv.sh

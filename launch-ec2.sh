@@ -1,26 +1,35 @@
 #!/bin/bash
 # launch an EC2 server and install application
+
+# this script runs on a machine where "Universal Command Line Interface for Amazon Web Services"
+# https://github.com/aws/aws-cli is installed and is authenticated to amazon web services
+
+# like a russia doll, this script 
+#    -   creates a script that runs as root on a brand new amazon linux ec2 
+#    -   creates a script that runs as the 'aspace' unix role account that installs archives space
+
 set -eu
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )" # http://stackoverflow.com/questions/59895
 . $DIR/setenv.sh
 cd $DIR
+# make these parameters; not stuff read from setenv.sh
+echo "$DB_INSTANCE_IDENTIFIER $TAG $EC2_SIZE $RDS_SIZE"
 
-hackconf() {	# poor man's templates; hard coded parameters
+# poor man's templates; hard coded parameters
+hackconf() {	
   sed -e "s,%{DB_URL},$2," -e "s,%{TAG},$3,g" -e "s,%{PW1},$4," -e "s,%{PW2},$5," $1.template.sh > $1
 }
 
-# figure out database connection string to put in confing/config.rb
-password=`cat ~/.ec2/.dbpass`
 
 # see if the database is up
+# "jq is like sed for JSON" data http://stedolan.github.com/jq/
 endpoint=`aws --region $EC2_REGION rds describe-db-instances --db-instance-identifier $DB_INSTANCE_IDENTIFIER | jq .DBInstances[0].Endpoint.Address -r`
 echo $endpoint
 if [ "$endpoint" != 'null' ]
   then
     echo "$endpoint" is already running
-    echo "Do you start an EC2 still?"
-    # http://stackoverflow.com/a/226724/1763984
-    select yn in "Yes" "No"; do
+    echo "Do you want to start an EC2 still?"
+    select yn in "Yes" "No"; do # http://stackoverflow.com/a/226724/1763984
         case $yn in
             Yes ) break;;
             No ) exit;;
@@ -28,8 +37,6 @@ if [ "$endpoint" != 'null' ]
     done
   else
     # launch the database
-    # http://docs.amazonwebservices.com/AmazonRDS/latest/CommandLineReference/CLIReference-cmd-CreateDBInstance.html
-    #rds-create-db-instance            \
     aws --region $EC2_REGION rds create-db-instance \
       --db-instance-identifier $DB_INSTANCE_IDENTIFIER \
       --db-instance-class $RDS_SIZE \
@@ -45,17 +52,20 @@ if [ "$endpoint" != 'null' ]
       --availability-zone $ZONE
 fi
 
-
-while [ "$endpoint" == 'null' or -z "$endpoint" ]
+# wait for the database to spin up if needed
+while [ "$endpoint" == 'null' -o -z "$endpoint" ]
   do
   sleep 15 
   echo "."
   endpoint=`aws --region $EC2_REGION rds describe-db-instances --db-instance-identifier $DB_INSTANCE_IDENTIFIER | jq .DBInstances[0].Endpoint.Address -r`
   done
 
+# figure out database connection string to put in confing/config.rb
+password=`cat ~/.ec2/.dbpass`
 db_url="jdbc:mysql://$endpoint:3306/archivesspace?user=aspace\&password=$password\&useUnicode=true\&characterEncoding=UTF-8"
 #                                                            ^ escaped & as \& for regex ...
 
+# make sure we have an endpoint
 if [ -z "$endpoint" ]; then		# not sure why set -u is not catching this
   echo "no endpoint, did you run launch-rds.sh?"
   exit 1
@@ -70,16 +80,27 @@ set -eux
 
 # install packages we need from amazon's repo
 yum -y update			# get the latest security updates
+
+## system configuration
+# redirect port 8080 to port 80 so we don't have to run tomcat as root
+# http://forum.slicehost.com/index.php?p=/discussion/2497/iptables-redirect-port-80-to-port-8080/p1
+iptables -A PREROUTING -t nat -i eth0 -p tcp --dport 80 -j REDIRECT --to-port 8080
+chkconfig sendmail off
+
+# install the rest of the software we need
+# git is needed for the build
 yum -y install git 
+# ant gives us better java
 yum -y install ant 
 
+# if we run the jar file; we need daemonize
 yum -y install http://fr2.rpmfind.net/linux/dag/redhat/el5/en/x86_64/dag/RPMS/daemonize-1.6.0-1.el5.rf.x86_64.rpm
 # yum -y install ftp://rpmfind.net/linux/dag/redhat/el5/en/i386/dag/RPMS/daemonize-1.6.0-1.el5.rf.i386.rpm
 
-# twincat tomcat setup needs xsltproc
+# twincat tomcat setup needs xsltproc for server.xml template
 yum install -y libxslt
 
-# these aren't strictly nessicary for the application but will be usful for debugging
+# these aren't strictly necessary for the application but will be usful for debugging
 
 # iotop is a handy utility on linux
 easy_install pip
@@ -91,10 +112,6 @@ pip install http://guichaz.free.fr/iotop/files/iotop-0.4.4.tar.gz
 #    U    ack!
 curl http://betterthangrep.com/ack-standalone > /usr/local/bin/ack && chmod 0755 /usr/local/bin/ack
 
-# redirect port 8080 to port 80 so we don't have to run tomcat as root
-# http://forum.slicehost.com/index.php?p=/discussion/2497/iptables-redirect-port-80-to-port-8080/p1
-iptables -A PREROUTING -t nat -i eth0 -p tcp --dport 80 -j REDIRECT --to-port 8080
-chkconfig sendmail off
 
 DELIM
 
@@ -128,6 +145,7 @@ if [ -e /media/ephemeral0 ]; then
   ln -s /media/ephemeral0/aspace /home/aspace
 fi
 
+# install public keys for operator accounts
 su - ec2-user -c 'curl https://raw.github.com/tingletech/aws-as/master/public-keys >> ~/.ssh/authorized_keys'
 
 
@@ -149,6 +167,7 @@ cat as_role_account.sh >> aws_init.sh
 # finish off the user-data payload file
 cat >> aws_init.sh << DELIM
 EOSETUP
+# init.sh will have passwords, it should be removed if it runs; leave for debugging if it fails
 su - aspace -c ~aspace/init.sh
 rm ~aspace/init.sh 
 ## chkconfig an init.d script that will start and stop monit
@@ -160,9 +179,6 @@ base64 aws_init.sh.gz > aws_init.sh.gz.base64
 # clean up
 rm as_role_account.sh 
 
-# http://docs.amazonwebservices.com/AWSEC2/latest/CommandLineReference/ApiReference-cmd-RunInstances.html
-# "You must have the key pair where you run your script." -- https://forums.aws.amazon.com/message.jspa?messageID=88003
-# ec2-run-instances $AMI_EBS            \
 command="aws --region $EC2_REGION ec2 run-instances 
      --min-count 1                                   
      --image-id $AMI_EBS                             
@@ -175,8 +191,10 @@ command="aws --region $EC2_REGION ec2 run-instances
 
 echo "ec2 launch command"
 
+# launch an ec2 and grab the instance id
 instance=`$command | jq '.Instances[0] | .InstanceId' -r`
 
+# wait for the new ec2 machine to get its hostname
 hostname=`aws ec2 describe-instances --instance-ids $instance | jq ' .Reservations[0] | .Instances[0] | .PublicDnsName'` 
 echo "instance started, waiting for hostname"
 while [ "$hostname" = '""' ]

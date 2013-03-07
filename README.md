@@ -3,6 +3,18 @@
 This github gist contains scripts used to launch the alpha version
 of an archival management system product on Amazon Web Services.
 
+todo
+----
+
+needs reorder; see source code of these file for most up to date comments
+
+ * `./launch-build.sh`  lanuch an ec2 to build the app and test it with selenium/firefox; then upload to s3; ping irc
+   -  `./upload_files.py`  generate temporary signed s3 upload URLs to POST files
+ * `./launch-ec2.sh`  start up an RDS database, then start up an EC2 server
+   -  `./as_role_account.sh.template.sh`  template for install script run as `aspace` user 
+   -  `./archivesspace.sh`  init.d style start script for jar file
+
+here is the original order / some obsolete parts removed 2013-Mar-06
 
 Installation
 ------------
@@ -39,6 +51,8 @@ Grab the amazon command line tools.
 ./grabazon.sh
 ```
 
+Also; https://github.com/aws/aws-cli is needed
+
 The python library `boto` needs to be set up with the S3 credential for the push to S3 to work.
 
 grant access (security groups left as an exercise for the reader)
@@ -73,54 +87,31 @@ Launch a m1.large, build the `.jar` and `.war`, push the artifacts to S3, termin
 ```sh
 ./launch-build.sh
 ```
-
-Launch mysql on AWS RDS
-----------------------
-
-```sh
-./launch-rds.sh
-```
-
-Wait for the server to spin up.  At first, `rds-describe-db-instances` will return something like this:
-```
-DBINSTANCE  alpha01  db.m1.small  mysql  10  aspace  creating  us-east-1b  1  ****  n  5.5.25a  general-public-license
-      SECGROUP  default  active
-      PARAMGRP  default.mysql5.5  in-sync
-      OPTIONGROUP  default:mysql-5-5  in-sync
-```
-
-Once the database has cranked up; you should see something like this:
-
-```
-DBINSTANCE  alpha01  2012-08-31T20:27:02.502Z  db.m1.small  mysql  10  aspace  backing-up  alpha01.blahblah.us-east-1.rds.amazonaws.com  3306  us-east-1b  1  n  5.5.25a  general-public-license
-      SECGROUP  default  active
-      PARAMGRP  default.mysql5.5  in-sync
-      OPTIONGROUP  default:mysql-5-5  in-sync
-```
-
+(ubuntu/alestic.com)
 
 Launch the EC2 server.
 ----------------------
 
-Once the database is running the build artifacts are on s3. 
+Start up the database, wait, start up an ec2, wait, report hostname (sould report instance id as well probably)
 
 ```sh
 ./launch-ec2.sh
 ```
+(amazon linux)
 
 AWS Command Documentation
 ------------------
 
-[rds-create-db-instance](http://docs.amazonwebservices.com/AmazonRDS/latest/CommandLineReference/CLIReference-cmd-CreateDBInstance.html)
+[aws-cli](https://github.com/aws/aws-cli) is new
 
-[ec2-run-instances](http://docs.amazonwebservices.com/AWSEC2/latest/CommandLineReference/ApiReference-cmd-RunInstances.html)
+[ec2-run-instances](http://docs.amazonwebservices.com/AWSEC2/latest/CommandLineReference/ApiReference-cmd-RunInstances.html) is old and used by `launch-build.sh`
 
 [ubuntu cloud init](https://help.ubuntu.com/community/CloudInit) is used by the [Amazon Linux AMI](http://aws.amazon.com/amazon-linux-ami/)
 
 License
 -------
 
-Copyright © 2012, Regents of the University of California
+Copyright © 2013, Regents of the University of California
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without 

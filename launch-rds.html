@@ -1,0 +1,23 @@
+<!DOCTYPE html>  <html> <head>   <title>launch-rds.sh</title>   <meta http-equiv="content-type" content="text/html; charset=UTF-8">   <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">   <link rel="stylesheet" media="all" href="docco.css" /> </head> <body>   <div id="container">     <div id="background"></div>          <ul class="sections">           <li id="title">             <div class="annotation">                 <h1>launch-rds.sh</h1>             </div>         </li>                              <li id="section-1">             <div class="annotation">               <div class="pilwrap">                 <a class="pilcrow" href="#section-1">&#182;</a>               </div>                                        </div>                          <div class="content"><div class="highlight"><pre><span class="c">#!/bin/bash</span></pre></div></div>                      </li>                              <li id="section-2">             <div class="annotation">               <div class="pilwrap">                 <a class="pilcrow" href="#section-2">&#182;</a>               </div>                           
+
+<p>launch a mysql server on RDS</p>
+
+             </div>                          <div class="content"><div class="highlight"><pre><span class="nb">set</span> -eu
+<span class="nv">DIR</span><span class="o">=</span><span class="s2">&quot;$( cd &quot;</span><span class="k">$(</span> dirname <span class="s2">&quot;${BASH_SOURCE[0]}&quot;</span> <span class="k">)</span><span class="s2">&quot; &amp;&amp; pwd )&quot;</span> <span class="c"># http://stackoverflow.com/questions/59895</span>
+. <span class="nv">$DIR</span>/setenv.sh</pre></div></div>                      </li>                              <li id="section-3">             <div class="annotation">               <div class="pilwrap">                 <a class="pilcrow" href="#section-3">&#182;</a>               </div>                           
+
+<p>http://docs.amazonwebservices.com/AmazonRDS/latest/CommandLineReference/CLIReference-cmd-CreateDBInstance.html
+rds-create-db-instance            \</p>             </div>                          <div class="content"><div class="highlight"><pre>aws --region <span class="nv">$EC2_REGION</span> rds create-db-instance <span class="se">\</span>
+  --db-instance-identifier <span class="nv">$DB_INSTANCE_IDENTIFIER</span> <span class="se">\</span>
+  --db-instance-class <span class="nv">$RDS_SIZE</span> <span class="se">\</span>
+  --db-parameter-group-name utf8  <span class="se">\</span>
+  --engine MySQL                  <span class="se">\</span>
+  --db-name archivesspace         <span class="se">\</span>
+  --master-user-password <span class="sb">`</span>cat ~/.ec2/.dbpass<span class="sb">`</span>  <span class="se">\</span>
+  --port 3306                     <span class="se">\</span>
+  --backup-retention-period 1     <span class="se">\</span>
+  --allocated-storage 10          <span class="se">\</span>
+  --master-username aspace        <span class="se">\</span>
+  --availability-zone <span class="nv">$ZONE</span>
+
+</pre></div></div>                      </li>              </ul>    </div> </body> </html> 

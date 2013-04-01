@@ -5,18 +5,21 @@
 
 export EC2_URL=http://ec2.us-east-1.amazonaws.com
 
-export BLITZ_RUSH=`tail -1 ~/.ec2/blitz.txt`
+# export BLITZ_RUSH=`tail -1 ~/.ec2/blitz.txt`
 
 export EC2_REGION=us-east-1
 export ZONE=us-east-1b
-export DB_INSTANCE_IDENTIFIER=load034
-export TAG="v0.3.4"
+export DB_INSTANCE_IDENTIFIER=load02
+export TAG="v0.4.1"
 
-export RDS_SIZE="db.t1.micro"
-export EC2_SIZE="t1.micro"
+#export RDS_SIZE="db.t1.micro"
+#export EC2_SIZE="t1.micro"
 
 #export RDS_SIZE="db.m1.medium"
-#export EC2_SIZE="m1.large"
+#export EC2_SIZE="m1.medium"
+
+export RDS_SIZE="db.m1.small"
+export EC2_SIZE="m1.small"
 
 # http://aws.amazon.com/amazon-linux-ami/ 
 export AMI=ami-94cd60fd			# this is a 64-bit Amazon Linux AMI with session storage (m1.)

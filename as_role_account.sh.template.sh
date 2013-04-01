@@ -16,9 +16,13 @@ mkdir -p lib/frontend/WEB-INF/app/views/site/
 curl https://raw.github.com/tingletech/aws-as/master/_footer.html.erb -o lib/frontend/WEB-INF/app/views/site/_footer.html.erb
 # show the version number
 echo "%{TAG}" >> lib/frontend/WEB-INF/app/views/site/_footer.html.erb
+curl http://169.254.169.254/latest/meta-data/instance-id >> lib/frontend/WEB-INF/app/views/site/_footer.html.erb
 # now, zip that bad boy into the jar file
 cd lib
+unzip archivesspace.jar frontend/WEB-INF/config/help.yml
+sed -i 's#http://aspace.hudmol.com/help/Default.*htm#http://www.archivesspace.org/get-involved/software-testing-help/#g' frontend/WEB-INF/config/help.yml 
 zip -u archivesspace.jar frontend/WEB-INF/app/views/site/_footer.html.erb
+zip -u archivesspace.jar frontend/WEB-INF/config/help.yml 
 cd ..
 # back in ~/archivesspace/lib; grab the GPL mysql connector
 curl http://repo1.maven.org/maven2/mysql/mysql-connector-java/5.1.21/mysql-connector-java-5.1.21.jar -o lib/mysql-connector-java-5.1.21.jar
@@ -38,18 +42,22 @@ AppConfig[:public_url] = "http://localhost:8081"
 AppConfig[:solr_url] = "http://localhost:8082"
 AppConfig[:search_user_secret] = "%{PW1}"
 AppConfig[:public_user_secret] = "%{PW2}"
+AppConfig[:allow_other_unmapped] = true
 RAILSCONFIG
 # end of here file with config.rb 
 
 #unzip as-build.zip
 #./build/run db:migrate
-#curl -v -X POST http://localhost:8089/setup/update_schema
 
 # set up jar style as a back up
 # archivesspace.sh requires daemonize http://software.clapper.org/daemonize/
 wget https://raw.github.com/tingletech/aws-as/master/archivesspace.sh
 chmod a+x archivesspace.sh
-# ./archivesspace.sh start
+./archivesspace.sh start
+sleep 60
+curl -v -X POST http://localhost:8089/setup/update_schema
+
+exit
 
 # set up solr, for use with tomcat
 mkdir -p ~/aspace-solr-data  # data directory
@@ -111,7 +119,8 @@ pkill java
 # add in our custom footer template
 cd appFront/webapps
 curl https://raw.github.com/tingletech/aws-as/master/_footer.html.erb -o ROOT/WEB-INF/app/views/site/_footer.html.erb
-echo "%{TAG}" >> ROOT/WEB-INF/app/views/site/_footer.html.erb
+echo "%{TAG} " >> ROOT/WEB-INF/app/views/site/_footer.html.erb
+curl http://169.254.169.254/latest/meta-data/instance-id >> ROOT/WEB-INF/app/views/site/_footer.html.erb
 ## need to put a sed in here to switch out the URL for the help documentation
 ## this is only happening in the tomcat/ not the .jar
 sed -i 's#http://aspace.hudmol.com/help/Default.*htm#http://www.archivesspace.org/get-involved/software-testing-help/#g' ROOT/WEB-INF/config/help.yml

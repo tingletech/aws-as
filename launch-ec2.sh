@@ -1,6 +1,6 @@
 #!/bin/bash
 # launch an EC2 server and install application
-
+set -x
 # this script runs on a machine where "Universal Command Line Interface for Amazon Web Services"
 # https://github.com/aws/aws-cli is installed and is authenticated to amazon web services
 
@@ -20,6 +20,8 @@ hackconf() {
   sed -e "s,%{DB_URL},$2," -e "s,%{TAG},$3,g" -e "s,%{PW1},$4," -e "s,%{PW2},$5," $1.template.sh > $1
 }
 
+# figure out database connection string to put in confing/config.rb
+password=`cat ~/.ec2/.dbpass`
 
 # see if the database is up
 # "jq is like sed for JSON" data http://stedolan.github.com/jq/
@@ -60,8 +62,6 @@ while [ "$endpoint" == 'null' -o -z "$endpoint" ]
   endpoint=`aws --region $EC2_REGION rds describe-db-instances --db-instance-identifier $DB_INSTANCE_IDENTIFIER | jq .DBInstances[0].Endpoint.Address -r`
   done
 
-# figure out database connection string to put in confing/config.rb
-password=`cat ~/.ec2/.dbpass`
 db_url="jdbc:mysql://$endpoint:3306/archivesspace?user=aspace\&password=$password\&useUnicode=true\&characterEncoding=UTF-8"
 #                                                            ^ escaped & as \& for regex ...
 
@@ -197,7 +197,7 @@ instance=`$command | jq '.Instances[0] | .InstanceId' -r`
 # wait for the new ec2 machine to get its hostname
 hostname=`aws ec2 describe-instances --instance-ids $instance | jq ' .Reservations[0] | .Instances[0] | .PublicDnsName'` 
 echo "instance started, waiting for hostname"
-while [ "$hostname" = '""' ]
+while [ "$hostname" == '""' -o -z "$hostname" -o "$hostname" == 'null' ]
   do
   sleep 15
   echo "."

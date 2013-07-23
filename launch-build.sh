@@ -42,7 +42,7 @@ cd archivesspace
 ./build/run common:test
 SCREENSHOT_ON_ERROR=1 xvfb-run --server-args="-screen 0 1024x768x24" ./build/run selenium:test
 SCREENSHOT_ON_ERROR=1 xvfb-run --server-args="-screen 0 1024x768x24" ./build/run selenium:public:test
-./build/run dist
+./build/run dist -Dversion="$TAG"
 DELIM
 
 ./upload_files.py $TAG >> aws_builder_init.sh
